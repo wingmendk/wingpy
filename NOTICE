@@ -1,0 +1,17 @@
+This library is licensed under the GNU General Public License v3.0 (GPLv3).
+
+You are free to use, modify, and redistribute this software under the terms of the GPLv3. However, please note the following:
+
+1. Derivative Works:
+   Any software that imports, links to, or otherwise uses this library is considered a derivative work. If such software is distributed, it must also be licensed under the GPLv3 and made available with complete source code.
+
+2. Attribution Requirement:
+   You must retain all copyright and license notices. In addition, you must give appropriate credit to the copyright holder, Wingmen Solutions ApS, in any documentation, README, or user-facing notice accompanying your distributed software.
+
+3. Warranty Disclaimer:
+   This software is provided “as is,” without warranty of any kind, express or implied.
+
+4. Commercial Use:
+   If you wish to use this library in proprietary software or outside the terms of the GPLv3, commercial licenses are available. Please contact wingpy@wingmen.dk for details.
+
+The full text of the GNU GPLv3 license is available at https://www.gnu.org/licenses/gpl-3.0.en.html.

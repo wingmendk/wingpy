@@ -1,0 +1,145 @@
+[project]
+name = "wingpy"
+version = "1.0.0"
+description = "API client library built for network engineers."
+readme = "README.md"
+authors = [
+    { name = "Wingmen Solutions ApS" },
+    { name = "Andreas Baekdahl" },
+    { name = "Emil Bisgaard Commerou" },
+]
+requires-python = ">=3.10, <3.14"
+dependencies = [
+    "arrow>=1.3.0",
+    "h2>=4.2.0",
+    "httpx[socks]>=0.28.1",
+    "loguru>=0.7.3",
+    "lxml>=5.3.2",
+    "packaging>=24.2",
+]
+keywords = [
+    "Cisco",
+    "DevNet",
+    "REST",
+    "RESTful API",
+    "REST API",
+    "RESTAPI",
+    "FMC",
+    "Firepower",
+    "APIC",
+    "ACI",
+    "Hyperfabric",
+    "Network Automation",  
+]
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE", "NOTICE", "AUTHORS"]
+
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: System :: Networking",
+  "Topic :: Software Development :: Libraries",
+]
+
+[project.urls]
+Repository = "https://github.com/wingmendk/wingpy"
+Documentation = "https://wingpy.automation.wingmen.dk"
+Homepage = "https://www.wingmen.dk/en/home-page/"
+Issues = "https://github.com/wingmendk/wingpy/issues"
+
+[dependency-groups]
+dev = [
+    "dotenv>=0.9.9",
+    "flask-limiter==3.11",
+    "pytest>=8.3.5",
+    "pytest-azurepipelines>=1.0.5",
+    "pytest-cov>=6.1.1",
+    "pytest-xdist>=3.6.1",
+    "tox-uv>=1.25.0",
+    "ruff>=0.11.5",
+]
+
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-awesome-pages-plugin>=2.10.1",
+    "mkdocs-glightbox>=0.4.0",
+    "mkdocs-material>=9.6.11",
+    "mkdocstrings[python]>=0.29.1",
+    "pygments>=2.19.1",
+    "pymdown-extensions~=10.14",
+    "termynal>=0.13.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.coverage.report]
+skip_empty = true
+exclude_also = ["@abstractmethod", "pass"]
+
+[tool.coverage.run]
+parallel = true
+
+[tool.pytest.ini_options]
+addopts = "-n auto --dist loadgroup -v --cov-append --cov=src/wingpy --cov-report xml --cov-report term-missing --no-coverage-upload --exitfirst --maxfail=1"
+# -n auto: distribute test across all available CPU cores
+# --dist loadgroup: distribute tests in groups, to keep related tests together and sequential
+# -v: verbose output
+# --cov-append: append coverage data into one single file
+# --cov=src/wingpy: specify the source directory for coverage
+# --cov-report xml: XML format supported by Azure DevOps
+# --cov-report term-missing: show missing lines in terminal output
+# --no-coverage-upload: do not upload each coverage report to Azure DevOps indivually. Pipeline will upload the final, combined report.
+# --exitfirst:Stop a xdist worker after the first failure
+# --maxfail=1: stop other workers after the first exit
+testpaths = ["tests"]
+
+
+[tool.tox]
+envlist = ["py310", "py311", "py312", "py313"]
+parallel = "4" # Run all 4 environments in parallel
+requires = ["tox-uv"]
+
+[tool.tox.env_run_base]
+usedevelop = true # Install wingpy in edit mode
+set_env = { COVERAGE_FILE = ".coverage.{env_name}" } # Use unique coverage files for each environment
+pass_env = [
+    "WINGPY_*",
+    "COVERAGE_*",
+] # Allow all wingpy and coverage global environment variables to be passed to version-specific environment
+description = "Run pytest with {base_python}" # Unique description for each environment will show up in test report on Azure DevOps
+dependency_groups = ["dev"] # pytest dependencies are in the dev group
+commands = [
+    ["pytest", "--test-run-title='pytest with {env_name}'"] # Run pytest in each environment
+]
+allowlist_externals = ["pytest"]
+install_command = "uv pip install {opts} {packages}" # Use uv to install dependencies
+
+[tool.ruff]
+line-length = 88 # default for black
+respect-gitignore = true # easy life!
+
+
+[tool.ruff-lint]
+select = [
+    "I", # sort imports (don't move! workaround for bug)
+    "A",  # prevent using keywords that clobber python builtins
+    "B",  # bugbear: security warnings
+    "E",  # pycodestyle
+    "F",  # pyflakes
+    "ISC",  # implicit string concatenation
+    "UP",  # alert you when better syntax is available in your python version (maybe not?)
+    "RUF",  # the ruff developer's own rules
+]
+
+[tool.ruff.lint.isort]
+known-local-folder = ["src/wingpy"]

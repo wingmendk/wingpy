@@ -1,0 +1,17 @@
+{
+    "log_level": "debug",
+    "ado": {
+        "organization": "wingmen",
+        "project": "wingpy",
+        "wit": "issue",
+        "states": {
+            "new": "New",
+            "closed": "Done",
+            "reopened": "New",
+            "deleted": "Done",
+            "active": "Doing"
+        },
+        "bypassRules": true,
+        "assignedTo": "anb@wingmen.dk"
+    }
+}
