@@ -8,6 +8,7 @@ import copy
 import json
 import math
 import os
+import re
 from ssl import SSLContext
 from urllib.parse import urlparse
 
@@ -16,7 +17,7 @@ from loguru import logger
 from lxml import etree
 from packaging.version import Version
 
-from wingpy.base import RestApiBaseClass, RetryResponse
+from wingpy.base import HttpResponsePattern, RestApiBaseClass
 from wingpy.exceptions import AuthenticationFailure, UnsupportedMethodError
 
 
@@ -67,23 +68,17 @@ class CiscoAPIC(RestApiBaseClass):
     ```
     """
 
-    RETRY_RESPONSES = {
-        RetryResponse(
-            status_code=503,
-            method="GET",
-            content="<!DOCTYPE html>\n<html>\n<head>\n<title>Error</title>\n<style>\n    body {\n        width: 35em;\n        margin: 0 auto;\n        font-family: Tahoma, Verdana, Arial, sans-serif;\n    }\n</style>\n</head>\n<body>\n<h1>An error occurred.</h1>\n<p>Sorry, the page you are looking for is currently unavailable.<br/>\nPlease try again later.</p>\n<p>If you are the system administrator of this resource then you should check\nthe error log for details.</p>\n<p><em>Faithfully yours, nginx.</em></p>\n</body>\n</html>\n",
+    RETRY_RESPONSES = [
+        HttpResponsePattern(
+            status_codes=[503],
+            methods=["GET", "POST", "DELETE"],
+            content_patterns=[
+                re.compile(
+                    r"<!DOCTYPE html>\n<html>\n<head>\n<title>Error</title>\n<style>\n    body {\n        width: 35em;\n        margin: 0 auto;\n        font-family: Tahoma, Verdana, Arial, sans-serif;\n    }\n</style>\n</head>\n<body>\n<h1>An error occurred\.</h1>\n<p>Sorry, the page you are looking for is currently unavailable\.<br/>\nPlease try again later\.</p>\n<p>If you are the system administrator of this resource then you should check\nthe error log for details\.</p>\n<p><em>Faithfully yours, nginx\.</em></p>\n</body>\n</html>\n"
+                )
+            ],
         ),
-        RetryResponse(
-            status_code=503,
-            method="POST",
-            content="<!DOCTYPE html>\n<html>\n<head>\n<title>Error</title>\n<style>\n    body {\n        width: 35em;\n        margin: 0 auto;\n        font-family: Tahoma, Verdana, Arial, sans-serif;\n    }\n</style>\n</head>\n<body>\n<h1>An error occurred.</h1>\n<p>Sorry, the page you are looking for is currently unavailable.<br/>\nPlease try again later.</p>\n<p>If you are the system administrator of this resource then you should check\nthe error log for details.</p>\n<p><em>Faithfully yours, nginx.</em></p>\n</body>\n</html>\n",
-        ),
-        RetryResponse(
-            status_code=503,
-            method="DELETE",
-            content="<!DOCTYPE html>\n<html>\n<head>\n<title>Error</title>\n<style>\n    body {\n        width: 35em;\n        margin: 0 auto;\n        font-family: Tahoma, Verdana, Arial, sans-serif;\n    }\n</style>\n</head>\n<body>\n<h1>An error occurred.</h1>\n<p>Sorry, the page you are looking for is currently unavailable.<br/>\nPlease try again later.</p>\n<p>If you are the system administrator of this resource then you should check\nthe error log for details.</p>\n<p><em>Faithfully yours, nginx.</em></p>\n</body>\n</html>\n",
-        ),
-    }
+    ]
     """
     Cisco APIC has not implemented HTTP status code 429 for rate limiting.
     Instead it returns an NGINX default error page with HTTP status code 503.

@@ -1,6 +1,6 @@
 [project]
 name = "wingpy"
-version = "1.0.0"
+version = "1.1.0"
 description = "API client library built for network engineers."
 readme = "README.md"
 authors = [
@@ -68,6 +68,7 @@ dev = [
 ]
 
 docs = [
+    "black>=25.1.0",
     "mkdocs>=1.6.1",
     "mkdocs-awesome-pages-plugin>=2.10.1",
     "mkdocs-glightbox>=0.4.0",

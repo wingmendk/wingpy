@@ -68,6 +68,12 @@ poetry add wingpy
   from wingpy import CiscoISE
   ```
 
+- Cisco Meraki Dashboard
+  
+  ```python
+  from wingpy import CiscoMerakiDashboard
+  ```
+
 ## Configuration
 
 The recommended way to specify API authentication parameters is through environment variables:

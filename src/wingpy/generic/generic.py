@@ -26,7 +26,7 @@ class GenericRESTAPI(RestApiBaseClass):
     ```
     """
 
-    RETRY_RESPONSES = set()
+    RETRY_RESPONSES = []
 
     MAX_CONNECTIONS = 1
 

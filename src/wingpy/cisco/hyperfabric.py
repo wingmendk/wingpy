@@ -46,7 +46,7 @@ class CiscoHyperfabric(RestApiBaseClass):
     ```
     """
 
-    RETRY_RESPONSES = set()
+    RETRY_RESPONSES = []
     """
     No explicit retry reponses are defined for Cisco Hyperfabric.
     """

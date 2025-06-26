@@ -13,6 +13,7 @@ from wingpy.cisco import (
     CiscoFMC,
     CiscoHyperfabric,
     CiscoISE,
+    CiscoMerakiDashboard,
 )
 from wingpy.generic import GenericRESTAPI
 
@@ -25,5 +26,6 @@ __all__ = [
     "CiscoISE",
     "GenericRESTAPI",
     "CiscoHyperfabric",
+    "CiscoMerakiDashboard",
     "RestApiBaseClass",
 ]

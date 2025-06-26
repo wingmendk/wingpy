@@ -6,6 +6,7 @@
 
 import math
 import os
+import re
 from ssl import SSLContext
 from urllib.parse import urlparse
 
@@ -13,7 +14,7 @@ import httpx
 from loguru import logger
 from packaging.version import Version
 
-from wingpy.base import RestApiBaseClass, RetryResponse
+from wingpy.base import HttpResponsePattern, RestApiBaseClass
 from wingpy.exceptions import UnsupportedMethodError
 
 
@@ -77,69 +78,32 @@ class CiscoFMC(RestApiBaseClass):
     9 connections will be used for parallel asynchronous requests.
     """
 
-    RETRY_RESPONSES = {
-        RetryResponse(status_code=200, method="GET", content="{}"),
-        RetryResponse(
-            status_code=500,
-            method="GET",
-            content='{"error":{"category":"OTHER","messages":[{}],"severity":"ERROR"}}',
+    RETRY_RESPONSES = [
+        HttpResponsePattern(
+            status_codes=[200], methods=["GET"], content_patterns=[re.compile(r"{}")]
         ),
-        RetryResponse(
-            status_code=500,
-            method="POST",
-            content='{"error":{"category":"OTHER","messages":[{}],"severity":"ERROR"}}',
+        HttpResponsePattern(
+            status_codes=[500],
+            methods=["GET", "POST", "PUT", "DELETE"],
+            content_patterns=[
+                re.compile(
+                    r'{"error":{"category":"OTHER","messages":\[{}\],"severity":"ERROR"}}'
+                ),
+                re.compile(
+                    r'{"error":{"category":"FRAMEWORK","messages":\[{"description":"The action type is null"}\],"severity":"ERROR"}}'
+                ),
+            ],
         ),
-        RetryResponse(
-            status_code=500,
-            method="PUT",
-            content='{"error":{"category":"OTHER","messages":[{}],"severity":"ERROR"}}',
+        HttpResponsePattern(
+            status_codes=[504],
+            methods=["GET", "POST", "PUT", "DELETE"],
+            content_patterns=[
+                re.compile(
+                    r'{"error":{"category":"FRAMEWORK","messages":\[{"description":"Request Timed Out\. Retry after sometime."}\],"severity":"ERROR"}}'
+                )
+            ],
         ),
-        RetryResponse(
-            status_code=500,
-            method="DELETE",
-            content='{"error":{"category":"OTHER","messages":[{}],"severity":"ERROR"}}',
-        ),
-        RetryResponse(
-            status_code=500,
-            method="GET",
-            content='{"error":{"category":"FRAMEWORK","messages":[{"description":"The action type is null"}],"severity":"ERROR"}}',
-        ),
-        RetryResponse(
-            status_code=500,
-            method="POST",
-            content='{"error":{"category":"FRAMEWORK","messages":[{"description":"The action type is null"}],"severity":"ERROR"}}',
-        ),
-        RetryResponse(
-            status_code=500,
-            method="PUT",
-            content='{"error":{"category":"FRAMEWORK","messages":[{"description":"The action type is null"}],"severity":"ERROR"}}',
-        ),
-        RetryResponse(
-            status_code=500,
-            method="DELETE",
-            content='{"error":{"category":"FRAMEWORK","messages":[{"description":"The action type is null"}],"severity":"ERROR"}}',
-        ),
-        RetryResponse(
-            status_code=504,
-            method="GET",
-            content='{"error":{"category":"FRAMEWORK","messages":[{"description":"Request Timed Out. Retry after sometime."}],"severity":"ERROR"}}',
-        ),
-        RetryResponse(
-            status_code=504,
-            method="POST",
-            content='{"error":{"category":"FRAMEWORK","messages":[{"description":"Request Timed Out. Retry after sometime."}],"severity":"ERROR"}}',
-        ),
-        RetryResponse(
-            status_code=504,
-            method="PUT",
-            content='{"error":{"category":"FRAMEWORK","messages":[{"description":"Request Timed Out. Retry after sometime."}],"severity":"ERROR"}}',
-        ),
-        RetryResponse(
-            status_code=504,
-            method="DELETE",
-            content='{"error":{"category":"FRAMEWORK","messages":[{"description":"Request Timed Out. Retry after sometime."}],"severity":"ERROR"}}',
-        ),
-    }
+    ]
     """
     The standard `HTTP 429` status code indicates that the user has sent
     too many requests in a given amount of time, and is being rate limited.

@@ -5,6 +5,7 @@
 # See the LICENSE, NOTICE, and AUTHORS files for more information.
 
 import json
+import re
 import threading
 from abc import ABC, ABCMeta, abstractmethod
 from dataclasses import dataclass
@@ -21,20 +22,23 @@ from wingpy.exceptions import AuthenticationFailure, InvalidEndpointError
 from wingpy.scheduling import RequestLogEntry, RequestThrottler, TaskRunner
 
 
-@dataclass(unsafe_hash=True)
-class RetryResponse:
+@dataclass
+class HttpResponsePattern:
     """
-    Parameter values for an HTTP transaction indicating a platform-specific retry.
+    Represents a specific HTTP response pattern for platform-specific handling.
+
+    Used to define conditions for retries, special handling, or other custom logic
+    based on HTTP response attributes.
     """
 
-    status_code: int
-    """HTTP response status code."""
+    status_codes: list[int]
+    """HTTP response status codes."""
 
-    method: str
-    """HTTP request method."""
+    methods: list[str]
+    """HTTP request methods."""
 
-    content: str
-    """HTTP reponse content."""
+    content_patterns: list[re.Pattern]
+    """HTTP response content RegEx patterns"""
 
 
 class RequireClassVarsMeta(ABCMeta):
@@ -100,11 +104,11 @@ class RequireClassVarsMeta(ABCMeta):
             Examples
             --------
             get_type_hints(CiscoFMC)
-                {'RETRY_RESPONSES': typing.ClassVar[set[wingpy.base.RetryResponse]],
+                {'RETRY_RESPONSES': typing.ClassVar[list[wingpy.base.HttpResponsePattern]],
                  'MAX_CONNECTIONS': typing.ClassVar[int]}
 
             get_type_hints(RestApiBaseClass)
-                {'RETRY_RESPONSES': typing.ClassVar[set[wingpy.base.RetryResponse]],
+                {'RETRY_RESPONSES': typing.ClassVar[list[wingpy.base.HttpResponsePattern]],
                  'MAX_CONNECTIONS': typing.ClassVar[int]}
 
 
@@ -134,7 +138,7 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
     It also defines the abstract methods that must be implemented by clients.
     """
 
-    RETRY_RESPONSES: ClassVar[set[RetryResponse]]
+    RETRY_RESPONSES: ClassVar[list[HttpResponsePattern]]
     """
     HTTP status codes and response text that should trigger a retry.
 
@@ -157,7 +161,7 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
         base_url: str,
         verify: SSLContext | bool = True,
         backoff_initial: int = 1,
-        backoff_multiplier: int = 2,
+        backoff_multiplier: float = 2.0,
         retries: int = 3,
         auth_lifetime: int = 0,
         auth_refresh_percentage: float = 1,
@@ -589,14 +593,7 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
                 continue
 
             # Platform specific responses that require retry
-            if (
-                RetryResponse(
-                    method=request.method,
-                    status_code=response.status_code,
-                    content=response.text,
-                )
-                in self.RETRY_RESPONSES
-            ):
+            if self.is_retry_response(response, request.method):
                 with self.tasks._lock:
                     logger.debug(
                         f"{response_log_prefix} invalid, requires retry: {response.status_code} {response.text}"
@@ -646,6 +643,21 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
             request=request,
             response=response,
         )
+
+    def is_retry_response(self, response: httpx.Response, method: str) -> bool:
+        result = False
+        for retry_reponse in self.RETRY_RESPONSES:
+            if (
+                response.status_code in retry_reponse.status_codes
+                and method in retry_reponse.methods
+            ):
+                for content_pattern in retry_reponse.content_patterns:
+                    if content_pattern.match(response.content.decode()):
+                        result = True
+                        break
+            if result:
+                break
+        return result
 
     def request(
         self,
