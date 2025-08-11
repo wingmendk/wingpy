@@ -460,7 +460,7 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
         request = self.client.build_request(
             method,
             url,
-            data=serialized_payload,
+            content=serialized_payload,
             headers=merged_headers,
             params=params,
             timeout=timeout,
@@ -909,7 +909,7 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
             json_data = json.dumps(data)
             return json_data
         elif isinstance(data, etree._Element):
-            xml_data = etree.tostring(data).decode()
+            xml_data = etree.tostring(data)
             return xml_data
         elif isinstance(data, str):
             return data
