@@ -479,7 +479,7 @@ class CiscoCatalystCenter(RestApiBaseClass):
         result = []
         offset = 1
 
-        while offset < 6:
+        while True:
             page = self.get_page(
                 path,
                 params=params,
