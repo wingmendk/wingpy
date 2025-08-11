@@ -226,6 +226,13 @@ class CiscoAPIC(RestApiBaseClass):
         """
         Handle meta data retrieval after authentication.
         """
+
+        auth_rsp_payload = auth_response.json()
+        refresh_timeout = auth_rsp_payload["imdata"][0]["aaaLogin"]["attributes"][
+            "refreshTimeoutSeconds"
+        ]
+        self.auth_lifetime = int(refresh_timeout)
+
         response = self.request(
             "GET",
             "/api/node/mo/uni/fabric/comm-default/https.json",
