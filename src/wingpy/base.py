@@ -15,10 +15,10 @@ from urllib.parse import urlparse
 
 import arrow
 import httpx
-from loguru import logger
 from lxml import etree
 
 from wingpy.exceptions import AuthenticationFailure, InvalidEndpointError
+from wingpy.logging import logger
 from wingpy.scheduling import RequestLogEntry, RequestThrottler, TaskRunner
 
 

@@ -11,11 +11,11 @@ from ssl import SSLContext
 from urllib.parse import urlparse
 
 import httpx
-from loguru import logger
 from packaging.version import Version
 
 from wingpy.base import HttpResponsePattern, RestApiBaseClass
 from wingpy.exceptions import UnsupportedMethodError
+from wingpy.logging import logger
 
 
 class CiscoFMC(RestApiBaseClass):

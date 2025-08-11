@@ -9,12 +9,12 @@ import os
 from ssl import SSLContext
 
 import httpx
-from loguru import logger
 from lxml import etree
 from packaging.version import Version
 
 from wingpy.base import RestApiBaseClass
 from wingpy.exceptions import InvalidEndpointError
+from wingpy.logging import logger
 
 
 class CiscoISE(RestApiBaseClass):

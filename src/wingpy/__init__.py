@@ -16,6 +16,7 @@ from wingpy.cisco import (
     CiscoMerakiDashboard,
 )
 from wingpy.generic import GenericRESTAPI
+from wingpy.logging import log_to_file, set_logging_level
 
 __version__ = metadata.version("wingpy")
 
@@ -28,4 +29,6 @@ __all__ = [
     "CiscoHyperfabric",
     "CiscoMerakiDashboard",
     "RestApiBaseClass",
+    "set_logging_level",
+    "log_to_file",
 ]

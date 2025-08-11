@@ -13,12 +13,12 @@ from ssl import SSLContext
 from urllib.parse import urlparse
 
 import httpx
-from loguru import logger
 from lxml import etree
 from packaging.version import Version
 
 from wingpy.base import HttpResponsePattern, RestApiBaseClass
 from wingpy.exceptions import AuthenticationFailure, UnsupportedMethodError
+from wingpy.logging import logger
 
 
 class CiscoAPIC(RestApiBaseClass):
