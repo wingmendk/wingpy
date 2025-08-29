@@ -100,7 +100,7 @@ fmc = CiscoFMC(base_url="https://1.2.3.4", username="admin", password="passw0rd"
 
 **Retrieve all items from a paginated API endpoint**
 
-Pages are retrieved in parallel for max. performance.
+Pages are retrieved in parallel for maximum performance.
 
 ```python
 networks = fmc.get_all("/api/fmc_config/v1/domain/{domainUUID}/object/hosts")
