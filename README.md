@@ -21,17 +21,17 @@ Plenty of examples and explanations are available in the [User Guide](https://wi
 
 ## Installation
 
-**Install via uv**
+### Install via uv
 ```bash
 uv add wingpy
 ```
 
-**Install via pip**
+### Install via pip
 ```bash
 pip install wingpy
 ```
 
-**Install via poetry**
+### Install via poetry
 ```bash
 poetry add wingpy
 ```
@@ -89,7 +89,7 @@ See more in the [User Guide](https://wingpy.automation.wingmen.dk/user-guide)
 
 Import the class matching the API you want to use. See full list in the [User Guide, API section](https://wingpy.automation.wingmen.dk/api/)
 
-**Connect to an API**
+### Connect to an API
 
 Parameters can be specified as environment variables or with static values. It is your responsibility to keep your secrets safe!
 
@@ -98,7 +98,7 @@ from wingpy import CiscoFMC
 fmc = CiscoFMC(base_url="https://1.2.3.4", username="admin", password="passw0rd")
 ```
 
-**Retrieve all items from a paginated API endpoint**
+### Retrieve all items from a paginated API endpoint
 
 Pages are retrieved in parallel for maximum performance.
 
