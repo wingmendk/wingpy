@@ -2,7 +2,7 @@
 
 __wingpy__ is an elegant and simple Cisco API library for Python, built for network engineers by [Wingmen Solutions](https://www.wingmen.dk/en/home-page/).
 
-All Cisco APIs differ in how they handle authentication, session management, rate limiting, path construction, pagination and concurrency. With __wingpy__ you don't need to wory about all of the complexities associated with this.
+All Cisco APIs differ in how they handle authentication, session management, rate limiting, path construction, pagination and concurrency. With __wingpy__ you don't need to worry about all of the complexities associated with this.
 
 Although many Cisco platforms have dedicated SDKs, each of them is designed and maintained individually and have notable differences. With __wingpy__, just start coding and interact directly with API endpoints! This makes it much easier to work with new Cisco platform APIs and automate across domains.
 
