@@ -38,7 +38,7 @@ poetry add wingpy
 
 ## Supported APIs
 
-- Cisco APIC (Application Centri Infrastructure / ACI)
+- Cisco APIC (Application Centric Infrastructure / ACI)
   
   ```python
   from wingpy import CiscoAPIC
