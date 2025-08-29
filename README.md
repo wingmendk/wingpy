@@ -1,4 +1,4 @@
-# Wingpy: Cisco APIs for humans
+# Wingpy: Cisco APIs for Humans
 
 __wingpy__ is an elegant and simple Cisco API library for Python, built for network engineers by [Wingmen Solutions](https://www.wingmen.dk/en/home-page/).
 
