@@ -161,9 +161,12 @@ class CiscoISE(RestApiBaseClass):
             timeout=None,
             auth=self.auth,
         )
-        xml_response_data = etree.fromstring(xml_response.content)  # type: ignore
-        self.version = Version(xml_response_data.xpath("//version")[0].text)
-        logger.info(f"ISE version: {self.version} detected")
+        if xml_response.status_code == 200:
+            xml_response_data = etree.fromstring(xml_response.content)  # type: ignore
+            self.version = Version(xml_response_data.xpath("//version")[0].text)
+            logger.info(f"ISE version: {self.version} detected")
+        else:
+            logger.info("Unable to detect ISE version")
 
     @property
     def is_authenticated(self) -> bool:

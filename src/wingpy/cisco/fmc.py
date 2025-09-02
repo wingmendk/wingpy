@@ -277,24 +277,27 @@ class CiscoFMC(RestApiBaseClass):
             auth=None,
         )
 
-        version_string = response.json()["items"][0]["serverVersion"]
+        if response.status_code == 200:
+            version_string = response.json()["items"][0]["serverVersion"]
 
-        version_elements = version_string.split(" (")
-        if len(version_elements) != 2:  # pragma: no cover
-            raise ValueError(
-                f"Unexpected version string format: {version_string}. Expected format: 'version (build)'"
+            version_elements = version_string.split(" (")
+            if len(version_elements) != 2:  # pragma: no cover
+                raise ValueError(
+                    f"Unexpected version string format: {version_string}. Expected format: 'version (build)'"
+                )
+
+            self.version = Version(version_elements[0])
+
+            # Adjust the rate limit based on the FMC version
+            if self.version >= Version("7.6"):
+                self.throttler.rate_limit_max_requests = 300
+            else:
+                self.throttler.rate_limit_max_requests = 120  # pragma: no cover
+            logger.info(
+                f"FMC version: {self.version} detected, expected rate limit: {self.throttler.rate_limit_max_requests} requests per minute"
             )
-
-        self.version = Version(version_elements[0])
-
-        # Adjust the rate limit based on the FMC version
-        if self.version >= Version("7.6"):
-            self.throttler.rate_limit_max_requests = 300
         else:
-            self.throttler.rate_limit_max_requests = 120  # pragma: no cover
-        logger.info(
-            f"FMC version: {self.version} detected, expected rate limit: {self.throttler.rate_limit_max_requests} requests per minute"
-        )
+            logger.info("Unable to detect FMC version")
 
     def get(
         self,

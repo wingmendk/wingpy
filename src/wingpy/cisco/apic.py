@@ -245,18 +245,21 @@ class CiscoAPIC(RestApiBaseClass):
             auth=None,
         )
 
-        https_throttle = response.json()["imdata"][0]["commHttps"]["attributes"]
+        if response.status_code == 200:
+            https_throttle = response.json()["imdata"][0]["commHttps"]["attributes"]
 
-        if https_throttle["globalThrottleSt"] == "enabled":
-            if https_throttle["globalThrottleUnit"] == "r/m":  # pragma: noqa
-                self.rate_limit_period = 60
-            elif https_throttle["globalThrottleUnit"] == "r/s":
-                self.rate_limit_period = 1
+            if https_throttle["globalThrottleSt"] == "enabled":
+                if https_throttle["globalThrottleUnit"] == "r/m":  # pragma: noqa
+                    self.rate_limit_period = 60
+                elif https_throttle["globalThrottleUnit"] == "r/s":
+                    self.rate_limit_period = 1
 
-            self.rate_limit_max_requests = int(https_throttle["globalThrottleRate"])
-            logger.info(
-                f"Rate limit for APIC is enabled with {self.rate_limit_max_requests} requests per {self.rate_limit_period} seconds"
-            )
+                self.rate_limit_max_requests = int(https_throttle["globalThrottleRate"])
+                logger.info(
+                    f"Rate limit for APIC is enabled with {self.rate_limit_max_requests} requests per {self.rate_limit_period} seconds"
+                )
+        else:
+            logger.info("Unable to detect throttle rate for APIC")
 
     @property
     def is_authenticated(self):

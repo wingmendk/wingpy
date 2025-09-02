@@ -208,9 +208,12 @@ class CiscoCatalystCenter(RestApiBaseClass):
             timeout=None,
             auth=None,
         )
-        version = response.json().get("response", {}).get("installedVersion", "0.0")
-        self.version = Version(version)
-        logger.info(f"Catalyst Center version: {self.version} detected")
+        if response.status_code == 200:
+            version = response.json().get("response", {}).get("installedVersion", "0.0")
+            self.version = Version(version)
+            logger.info(f"Catalyst Center version: {self.version} detected")
+        else:
+            logger.info("Unable to detect Catalyst Center version")
 
     def get(
         self,
