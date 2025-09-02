@@ -495,7 +495,7 @@ class CiscoISE(RestApiBaseClass):
             True if the path is an ERS endpoint, False otherwise.
         """
         path_is_ers_endpoint = "/ers/config" in f"{self.base_url}{path}"
-        logger.debug(f"Path {path} is ERS endpoint: {path_is_ers_endpoint}")
+        logger.trace(f"Path {path} is ERS endpoint: {path_is_ers_endpoint}")
         return path_is_ers_endpoint
 
     def is_xml(self, path: str) -> bool:
@@ -516,7 +516,7 @@ class CiscoISE(RestApiBaseClass):
             "/admin/API/NetworkAccessConfig/ERS" in f"{self.base_url}{path}"
             or "/admin/API/mnt/" in f"{self.base_url}{path}"
         )
-        logger.debug(f"Path {path} is XML endpoint: {path_is_xml_endpoint}")
+        logger.trace(f"Path {path} is XML endpoint: {path_is_xml_endpoint}")
         return path_is_xml_endpoint
 
     def get_all(
@@ -729,7 +729,7 @@ class CiscoISE(RestApiBaseClass):
 
         total_pages = math.ceil(total_count / page_size)
 
-        logger.debug(
+        logger.trace(
             f"Paging with {range(page_size, total_count, page_size) = } = {list(range(page_size, total_count, page_size))}"
         )
 

@@ -497,7 +497,7 @@ class CiscoCatalystCenter(RestApiBaseClass):
             result += page_reponse
 
             if len(page_reponse) < page_size:
-                logger.trace("Exiting pagination loop.")
+                logger.trace("Exiting pagination loop")
                 break
 
         logger.debug(f"Received {len(result)} items from {path}")
@@ -572,8 +572,8 @@ class CiscoCatalystCenter(RestApiBaseClass):
 
         page_reponse = rsp.json()["response"]
         if len(page_reponse) > 0:
-            logger.debug(f"Successfully retrieved page {page} from {path}.")
+            logger.debug(f"Successfully retrieved page {page} from {path}")
         else:
-            logger.debug(f"Page {page} returned no items.")
+            logger.debug(f"Page {page} returned no items")
 
         return rsp

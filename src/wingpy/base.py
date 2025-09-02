@@ -384,7 +384,7 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
         """
 
         # Authenticate
-        logger.debug("Authenticating and recording token lifetime.")
+        logger.debug("Authenticating and recording token lifetime")
         auth_response = self._authenticate()
 
         # Record the time of authentication
@@ -639,7 +639,7 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
                 )
                 return response
         raise httpx.HTTPStatusError(
-            f"Max attempts reached for {request_log_prefix}.",
+            f"Max attempts reached for {request_log_prefix}",
             request=request,
             response=response,
         )
@@ -917,5 +917,5 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
             return ""
         else:
             raise ValueError(
-                "Data for request payload must be provided as string, dict, list or lxml.etree.Element."
+                "Data for request payload must be provided as string, dict, list or lxml.etree.Element"
             )
