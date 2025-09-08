@@ -45,10 +45,10 @@ class CiscoMerakiDashboard(RestApiBaseClass):
     --------
     ```python
     from wingpy import CiscoMerakiDashboard
-    hyperfabric = CiscoMerakiDashboard(
+    merakidashboard = CiscoMerakiDashboard(
         token=" ",
     )
-    hyperfabric.get("/devices")
+    merakidashboard.get("/devices")
     ```
 
     Warnings
@@ -513,6 +513,10 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         )
 
         result = first_page.json()
+
+        # Meraki Dashboard returns empty responses as a dict instead of list
+        if not isinstance(result, list):
+            return []
 
         link_header = first_page.headers.get("link", "")
 

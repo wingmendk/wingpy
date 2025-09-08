@@ -313,6 +313,7 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
         """
         raise NotImplementedError
 
+    @property
     @abstractmethod
     def is_authenticated(self) -> bool:
         """
@@ -326,7 +327,15 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def get(self, path: str, **kwargs) -> httpx.Response:
+    def get(
+        self,
+        path: str,
+        *,
+        params: dict | None = None,
+        path_params: dict | None = None,
+        headers: dict | None = None,
+        timeout: int | None = None,
+    ) -> httpx.Response:
         """
         Abstract method to send a GET request to the API server.
 
@@ -335,7 +344,16 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def post(self, path: str, **kwargs) -> httpx.Response:
+    def post(
+        self,
+        path: str,
+        *,
+        data: str | dict | list | None,
+        params: dict | None = None,
+        path_params: dict | None = None,
+        headers: dict | None = None,
+        timeout: int | None = None,
+    ) -> httpx.Response:
         """
         Abstract method to send a POST request to the API server.
 
@@ -344,7 +362,16 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def put(self, path: str, **kwargs) -> httpx.Response:
+    def put(
+        self,
+        path: str,
+        *,
+        data: str | dict | list | None,
+        params: dict | None = None,
+        path_params: dict | None = None,
+        headers: dict | None = None,
+        timeout: int | None = None,
+    ) -> httpx.Response:
         """
         Abstract method to send a PUT request to the API server.
 
@@ -353,7 +380,16 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def patch(self, path: str, **kwargs) -> httpx.Response:
+    def patch(
+        self,
+        path: str,
+        *,
+        data: str | dict | list | None,
+        params: dict | None = None,
+        path_params: dict | None = None,
+        headers: dict | None = None,
+        timeout: int | None = None,
+    ) -> httpx.Response:
         """
         Abstract method to send a PATCH request to the API server.
 
@@ -362,7 +398,15 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def delete(self, path: str, **kwargs) -> httpx.Response:
+    def delete(
+        self,
+        path: str,
+        *,
+        params: dict | None = None,
+        path_params: dict | None = None,
+        headers: dict | None = None,
+        timeout: int | None = None,
+    ) -> httpx.Response:
         """
         Abstract method to send a DELETE request to the API server.
 
@@ -439,12 +483,18 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
             The prepared request object.
         """
 
+        if path[0] != "/":
+            raise ValueError(f"Path '{path}' does not begin with /")
+
         if isinstance(params, dict):
             params = params.copy()
 
         merged_headers = self.headers.copy()
         if isinstance(headers, dict):
             merged_headers.update(headers)
+
+        if path_params is not None and not isinstance(path_params, dict):
+            raise TypeError("path_params must be dictionary")
 
         merged_path_params = self.path_params.copy()
         if isinstance(path_params, dict):
@@ -756,9 +806,7 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
                 f"Invalid base URL. Hostname or IP addresses needed: {base_url}"
             )
         if parsed_url.path and parsed_url.path[-1] == "/":
-            raise ValueError(
-                f"Invalid base URL. Path must not end with a '/': {base_url}"
-            )
+            raise ValueError(f"Invalid base URL. Must not end with a '/': {base_url}")
 
     def build_url(self, path: str, path_params: dict):
         """
