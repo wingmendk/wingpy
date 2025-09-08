@@ -5,11 +5,12 @@
 # See the LICENSE, NOTICE, and AUTHORS files for more information.
 
 import os
+import re
 from ssl import SSLContext
 
 import httpx
 
-from wingpy.base import RestApiBaseClass
+from wingpy.base import HttpResponsePattern, RestApiBaseClass
 from wingpy.exceptions import UnsupportedMethodError
 
 
@@ -46,9 +47,19 @@ class CiscoHyperfabric(RestApiBaseClass):
     ```
     """
 
-    RETRY_RESPONSES = []
+    RETRY_RESPONSES = [
+        HttpResponsePattern(
+            status_codes=[500],
+            methods=["GET", "POST", "PUT", "DELETE"],
+            content_patterns=[
+                re.compile(
+                    r'{\n "message":  "resource limit exceeded. Please retry later",\n "field":  "orgLimit",\n "value":  "\d+",\n "status":  500,\n "errCode":  "ERR_CODE_NO_KNOWN_CODE",\n "trackingId":  "[0-9a-z\-]{36}"\n}'
+                )
+            ],
+        ),
+    ]
     """
-    No explicit retry reponses are defined for Cisco Hyperfabric.
+    Parallel requests to the same organization may trigger error messages instead of HTTP status code 429.
     """
 
     MAX_CONNECTIONS = 10
