@@ -74,6 +74,12 @@ poetry add wingpy
   from wingpy import CiscoMerakiDashboard
   ```
 
+- Cisco Nexus Dashboard
+  
+  ```python
+  from wingpy import CiscoNexusDashboard
+  ```
+
 ## Configuration
 
 The recommended way to specify API authentication parameters is through environment variables:

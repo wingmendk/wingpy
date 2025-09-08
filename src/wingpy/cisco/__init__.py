@@ -4,6 +4,7 @@ from wingpy.cisco.fmc import CiscoFMC
 from wingpy.cisco.hyperfabric import CiscoHyperfabric
 from wingpy.cisco.ise import CiscoISE
 from wingpy.cisco.merakidashboard import CiscoMerakiDashboard
+from wingpy.cisco.nexusdashboard import CiscoNexusDashboard
 
 __all__ = [
     "CiscoAPIC",
@@ -12,4 +13,5 @@ __all__ = [
     "CiscoISE",
     "CiscoHyperfabric",
     "CiscoMerakiDashboard",
+    "CiscoNexusDashboard",
 ]

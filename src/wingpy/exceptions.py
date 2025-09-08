@@ -23,3 +23,11 @@ class InvalidEndpointError(Exception):
     """
 
     pass
+
+
+class UnexpectedPayloadError(Exception):
+    """
+    Raised when the API returned payload with unexpected data structure.
+    """
+
+    pass

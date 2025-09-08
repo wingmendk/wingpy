@@ -65,6 +65,7 @@ dev = [
     "pytest-xdist>=3.6.1",
     "tox-uv>=1.25.0",
     "ruff>=0.11.5",
+    "typer>=0.17.3",
 ]
 
 docs = [
@@ -116,6 +117,7 @@ set_env = { COVERAGE_FILE = ".coverage.{env_name}" } # Use unique coverage files
 pass_env = [
     "WINGPY_*",
     "COVERAGE_*",
+    "CICD_*"
 ] # Allow all wingpy and coverage global environment variables to be passed to version-specific environment
 description = "Run pytest with {base_python}" # Unique description for each environment will show up in test report on Azure DevOps
 dependency_groups = ["dev"] # pytest dependencies are in the dev group
