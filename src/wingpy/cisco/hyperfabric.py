@@ -12,6 +12,7 @@ import httpx
 
 from wingpy.base import HttpResponsePattern, RestApiBaseClass
 from wingpy.exceptions import UnsupportedMethodError
+from wingpy.logger import log_exception
 
 
 class CiscoHyperfabric(RestApiBaseClass):
@@ -283,7 +284,7 @@ class CiscoHyperfabric(RestApiBaseClass):
 
         return response
 
-    def patch(self) -> None:  # ignore: type
+    def patch(self, *args, **kwargs) -> None:  # ignore: type
         """
         !!! failure "HTTP PATCH is not supported by Hyperfabric"
 
@@ -291,7 +292,9 @@ class CiscoHyperfabric(RestApiBaseClass):
         ------
         UnsupportedMethodError
         """
-        raise UnsupportedMethodError("Hyperfabric does not support PATCH requests")
+        error = UnsupportedMethodError(method="PATCH", client=self)
+        log_exception(error)
+        raise error
 
     def delete(
         self,

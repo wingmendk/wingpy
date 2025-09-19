@@ -12,7 +12,7 @@ from packaging.version import Version
 
 from wingpy.base import RestApiBaseClass
 from wingpy.exceptions import AuthenticationFailure, UnsupportedMethodError
-from wingpy.logging import logger
+from wingpy.logger import log_exception, logger
 
 
 class CiscoCatalystCenter(RestApiBaseClass):
@@ -195,7 +195,9 @@ class CiscoCatalystCenter(RestApiBaseClass):
         """
 
         if not self.is_authenticated:
-            raise AuthenticationFailure("Authentication required before use")
+            err = AuthenticationFailure("Authentication required before use")
+            log_exception(err)
+            raise err
 
         response = self.request(
             "GET",
@@ -373,7 +375,7 @@ class CiscoCatalystCenter(RestApiBaseClass):
 
         return response
 
-    def patch(self) -> None:  # ignore: type
+    def patch(self, *args, **kwargs) -> None:  # ignore: type
         """
         !!! failure "HTTP PATCH is not supported by Catalyst Center"
 
@@ -381,7 +383,9 @@ class CiscoCatalystCenter(RestApiBaseClass):
         ------
         UnsupportedMethodError
         """
-        raise UnsupportedMethodError("Catalyst Center does not support PATCH requests")
+        error = UnsupportedMethodError(client=self, method="PATCH")
+        log_exception(error)
+        raise error
 
     def delete(
         self,

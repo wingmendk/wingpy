@@ -7,7 +7,7 @@
 import json
 import re
 import threading
-from abc import ABC, ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from ssl import SSLContext
 from typing import ClassVar, get_type_hints
@@ -17,8 +17,15 @@ import arrow
 import httpx
 from lxml import etree
 
-from wingpy.exceptions import AuthenticationFailure, InvalidEndpointError
-from wingpy.logging import logger
+from wingpy.exceptions import (
+    AuthenticationFailure,
+    MissingPathParameterError,
+    URLNetlocError,
+    URLPathError,
+    URLSchemaError,
+)
+from wingpy.interfaces import ApiClient
+from wingpy.logger import log_exception, logger
 from wingpy.scheduling import RequestLogEntry, RequestThrottler, TaskRunner
 
 
@@ -128,7 +135,7 @@ class RequireClassVarsMeta(ABCMeta):
                 raise TypeError(f"{name} must define class variable '{var_name}'")
 
 
-class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
+class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
     """
     An abstract base class for REST API clients.
 
@@ -570,11 +577,9 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
                     timestamp=arrow.utcnow(),
                 ),
             )
-        except httpx.RequestError as e:
-            logger.critical(
-                f"{request_log_prefix}: Unable to connect to API with error: {e}"
-            )
-            raise e
+        except httpx.RequestError as error:
+            log_exception(error, severity="CRITICAL")
+            raise error
 
         with self.tasks._lock:
             # Ensure synchronized logging
@@ -667,14 +672,11 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
             # HTTP 401 Unauthorized
             elif response.status_code == 401:
                 self.throttler.reset_backoff()
+
                 if is_auth_endpoint:
-                    logger.error(
-                        f"{request_log_prefix} authentication failed (HTTP 401 Unauthorized)"
-                    )
-                    # Never retry authentication requests to avoid being locked out and infinite loops
-                    raise AuthenticationFailure(
-                        f"{request_log_prefix} authentication failed (HTTP 401 Unauthorized)"
-                    )
+                    error = AuthenticationFailure(request_log_prefix, response=response)
+                    log_exception(error, severity="CRITICAL")
+                    raise error
                 else:
                     return response
 
@@ -683,16 +685,17 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
                 return response
 
             else:
-                # Raise an exception for all other HTTP errors
                 logger.error(
                     f"{request_log_prefix} failed with status code {response.status_code}"
                 )
                 return response
-        raise httpx.HTTPStatusError(
+        error = httpx.HTTPStatusError(
             f"Max attempts reached for {request_log_prefix}",
             request=request,
             response=response,
         )
+        log_exception(error, severity="ERROR")
+        raise error
 
     def is_retry_response(self, response: httpx.Response, method: str) -> bool:
         result = False
@@ -793,20 +796,26 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
 
         Raises
         ------
-        ValueError
-            If the base URL is not valid.
+        URLSchemaError
+            If the base URL does not contain a scheme (http or https).
+        URLNetlocError
+            If the base URL does not contain a hostname or IP address.
+        URLPathError
+            If the base URL path ends with a `/`.
         """
         parsed_url = urlparse(base_url)
-        if not parsed_url.scheme:
-            raise ValueError(
-                f"Invalid base URL. Schema needed (eg. http:// or https://): {base_url}"
-            )
+        if parsed_url.scheme.lower() not in ("http", "https"):
+            error = URLSchemaError(base_url=base_url)
+            log_exception(error, severity="ERROR")
+            raise error
         if not parsed_url.netloc:
-            raise ValueError(
-                f"Invalid base URL. Hostname or IP addresses needed: {base_url}"
-            )
+            error = URLNetlocError(base_url=base_url)
+            log_exception(error, severity="ERROR")
+            raise error
         if parsed_url.path and parsed_url.path[-1] == "/":
-            raise ValueError(f"Invalid base URL. Must not end with a '/': {base_url}")
+            error = URLPathError(base_url=base_url)
+            log_exception(error, severity="ERROR")
+            raise error
 
     def build_url(self, path: str, path_params: dict):
         """
@@ -837,7 +846,7 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
         Raises
         ------
 
-        InvalidEndpointError
+        MissingPathParameterError
             If the resulting URL contains unsubstituted path parameters.
         """
 
@@ -850,9 +859,16 @@ class RestApiBaseClass(ABC, metaclass=RequireClassVarsMeta):
         try:
             url = f"{self.base_url}{path}".format(**merged_path_params)
         except KeyError as e:
-            raise InvalidEndpointError(
-                f"Missing path parameter: {e}. Available parameters: {', '.join(merged_path_params.keys())}"
+            missing_param = e.args[0]
+            available_params = ", ".join(merged_path_params.keys())
+            error = MissingPathParameterError(
+                parameter=missing_param,
+                available_params=available_params,
+                endpoint_path=path,
+                client=self,
             )
+            log_exception(error, severity="ERROR")
+            raise error
 
         return url
 

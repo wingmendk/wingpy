@@ -17,7 +17,7 @@ from wingpy.cisco import (
     CiscoNexusDashboard,
 )
 from wingpy.generic import GenericRESTAPI
-from wingpy.logging import log_to_file, set_logging_level
+from wingpy.logger import log_to_file, set_logging_level
 
 __version__ = metadata.version("wingpy")
 

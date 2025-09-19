@@ -17,8 +17,12 @@ from lxml import etree
 from packaging.version import Version
 
 from wingpy.base import HttpResponsePattern, RestApiBaseClass
-from wingpy.exceptions import AuthenticationFailure, UnsupportedMethodError
-from wingpy.logging import logger
+from wingpy.exceptions import (
+    AuthenticationFailure,
+    InvalidResponseError,
+    UnsupportedMethodError,
+)
+from wingpy.logger import log_exception, logger
 
 
 class CiscoAPIC(RestApiBaseClass):
@@ -202,21 +206,31 @@ class CiscoAPIC(RestApiBaseClass):
         )
 
         if response.status_code != 200:  # pragma: no cover
-            raise AuthenticationFailure(
-                f"Authentication failed with status code {response.status_code}"
+            error = AuthenticationFailure(
+                "Authentication failed",
+                response=response,
             )
+            log_exception(error)
+            raise error
 
         try:
             response_data = response.json()
         except json.JSONDecodeError:  # pragma: no cover
-            raise AuthenticationFailure("Authentication response is not in JSON format")
+            error = AuthenticationFailure(
+                "Authentication response is not in JSON format", response=response
+            )
+            log_exception(error)
+            raise error
 
         try:
             self._token = response_data["imdata"][0]["aaaLogin"]["attributes"]["token"]
         except (KeyError, IndexError):  # pragma: no cover
-            raise AuthenticationFailure(
-                f"Failed to retrieve authentication token from response: {response.text}"
+            error = AuthenticationFailure(
+                "Failed to retrieve authentication token from response.",
+                response=response,
             )
+            log_exception(error)
+            raise error
 
         self.headers["Cookie"] = f"APIC-Cookie={self._token}"
 
@@ -378,7 +392,7 @@ class CiscoAPIC(RestApiBaseClass):
 
         return response
 
-    def put(self) -> None:  # type: ignore
+    def put(self, *args, **kwargs) -> None:  # type: ignore
         """
         !!! failure "HTTP PUT is not supported by APIC"
 
@@ -386,9 +400,11 @@ class CiscoAPIC(RestApiBaseClass):
         ------
         UnsupportedMethodError
         """
-        raise UnsupportedMethodError("APIC does not support PUT requests")
+        error = UnsupportedMethodError(client=self, method="PUT")
+        log_exception(error)
+        raise error
 
-    def patch(self) -> None:  # type: ignore
+    def patch(self, *args, **kwargs) -> None:  # type: ignore
         """
         !!! failure "HTTP PATCH is not supported by APIC"
 
@@ -396,7 +412,9 @@ class CiscoAPIC(RestApiBaseClass):
         ------
         UnsupportedMethodError
         """
-        raise UnsupportedMethodError("APIC does not support PATCH requests")
+        error = UnsupportedMethodError(client=self, method="PATCH")
+        log_exception(error)
+        raise error
 
     def delete(
         self,
@@ -762,16 +780,20 @@ class CiscoAPIC(RestApiBaseClass):
         json_response_data = json_response.json()
 
         if "totalCount" not in json_response_data.keys():  # pragma: no cover
-            # Invalid response payload
-            raise KeyError(
-                f'Paginated response payload is expected to have an "totalCount" key. Available keys: {json_response_data.keys()}'
+            err = InvalidResponseError(
+                f'Paginated response payload is expected to have an "totalCount" key. Available keys: {json_response_data.keys()}',
+                response=json_response,
             )
+            log_exception(err)
+            raise err
 
         if "imdata" not in json_response_data.keys():  # pragma: no cover
-            # Invalid response payload
-            raise KeyError(
-                f'Paginated response payload is expected to have an "imdata" key. Available keys: {json_response_data.keys()}'
+            err = InvalidResponseError(
+                f'Paginated response payload is expected to have an "imdata" key. Available keys: {json_response_data.keys()}',
+                response=json_response,
             )
+            log_exception(err)
+            raise err
 
         total_count = int(json_response_data.get("totalCount"))
 
@@ -852,10 +874,12 @@ class CiscoAPIC(RestApiBaseClass):
             )
 
         if len(xml_response_data.items()) < 1:  # pragma: no cover
-            # Invalid response payload
-            raise Exception(
-                "Paginated response payload is expected to have child elements. No children found."
+            error = InvalidResponseError(
+                "Paginated response payload is expected to have child elements. No children found.",
+                response=xml_response,
             )
+            log_exception(error)
+            raise error
 
         total_count = int(xml_response_data.get("totalCount"))
 

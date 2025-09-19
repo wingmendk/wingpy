@@ -11,7 +11,8 @@ from ssl import SSLContext
 import httpx
 
 from wingpy.base import HttpResponsePattern, RestApiBaseClass
-from wingpy.exceptions import UnsupportedMethodError
+from wingpy.exceptions import InvalidResponseError, UnsupportedMethodError
+from wingpy.logger import log_exception
 
 
 class CiscoMerakiDashboard(RestApiBaseClass):
@@ -258,13 +259,18 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         -------
         httpx.Response
             The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+
+        Raises
+        ------
+        ValueError
+            If a query parameter value is a list but the parameter name does not end with `[]
         """
 
         if isinstance(params, dict):
             for param_key, param_value in params.items():
                 if isinstance(param_value, list) and param_key[-2:] != "[]":
                     raise ValueError(
-                        "Invalid query parameter name for 'list of strings'. List based query parameter names must end with []. I.e. {param_key}[] instaed of {param_key}"
+                        f"Invalid query parameter name for 'list of strings'. List based query parameter names must end with []. I.e. {param_key}[] instead of {param_key}"
                     )
 
         response = self.request(
@@ -387,7 +393,7 @@ class CiscoMerakiDashboard(RestApiBaseClass):
 
         return response
 
-    def patch(self) -> None:  # ignore: type
+    def patch(self, *args, **kwargs) -> None:  # ignore: type
         """
         !!! failure "HTTP PATCH is not supported by Meraki Dashboard"
 
@@ -395,7 +401,9 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         ------
         UnsupportedMethodError
         """
-        raise UnsupportedMethodError("Meraki Dashboard does not support PATCH requests")
+        error = UnsupportedMethodError(method="PATCH", client=self)
+        log_exception(error)
+        raise error
 
     def delete(
         self,
@@ -528,14 +536,20 @@ class CiscoMerakiDashboard(RestApiBaseClass):
                     next_url = url
 
             if next_url is None or self.base_url not in next_url:
-                raise RuntimeError(
-                    f"Pagination error: valid 'next' page URL not found in link header. {link_header}"
+                error = InvalidResponseError(
+                    message="Pagination error: valid 'next' page URL not found in link header.",
+                    response=first_page,
                 )
+                log_exception(error)
+                raise error
 
             if self.base_url != next_url[: len(self.base_url)]:  # pragma: nocover
-                raise RuntimeError(
-                    f"Pagination error: Invalid 'next' page URL. {next_url}"
+                error = InvalidResponseError(
+                    message="Pagination error: 'next' page URL not part of the same API as the base URL.",
+                    response=first_page,
                 )
+                log_exception(error)
+                raise error
 
             next_path = next_url[len(self.base_url) :]
 

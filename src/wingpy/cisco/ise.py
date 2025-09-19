@@ -14,7 +14,7 @@ from packaging.version import Version
 
 from wingpy.base import RestApiBaseClass
 from wingpy.exceptions import InvalidEndpointError
-from wingpy.logging import logger
+from wingpy.logger import log_exception, logger
 
 
 class CiscoISE(RestApiBaseClass):
@@ -572,7 +572,9 @@ class CiscoISE(RestApiBaseClass):
                 timeout=timeout,
             )
         elif self.is_xml(path):
-            raise InvalidEndpointError("XML endpoints do not support paging")
+            error = InvalidEndpointError(client=self, endpoint_path=path)
+            log_exception(error)
+            raise error
         else:
             return self.get_all_openapi(
                 path,
@@ -624,6 +626,12 @@ class CiscoISE(RestApiBaseClass):
         -------
         list[dict]
             A concatenated list of dictionaries, similar to the root list in the JSON responses.
+
+
+        Raises
+        ------
+        InvalidEndpointError
+            If the specified path is not a valid OpenAPI "Get all" endpoint.
         """
 
         logger.debug(f"Retrieving all pages from OpenAPI {path}")
@@ -648,9 +656,13 @@ class CiscoISE(RestApiBaseClass):
 
             json_response_data = page_response.json()
             if not isinstance(json_response_data, list):
-                raise InvalidEndpointError(
-                    '{path} is not an OpenAPI "Get all" endpoint'
+                error = InvalidEndpointError(
+                    f'{path} is not an OpenAPI "Get all" endpoint',
+                    client=self,
+                    endpoint_path=path,
                 )
+                log_exception(error)
+                raise error
 
             result += json_response_data
             if len(json_response_data) < page_size:
@@ -721,7 +733,13 @@ class CiscoISE(RestApiBaseClass):
         json_response_data = first_page.json()
 
         if "SearchResult" not in json_response_data.keys():
-            raise InvalidEndpointError(f'{path} is not an ERS "Get-All" endpoint')
+            error = InvalidEndpointError(
+                f'{path} is not an ERS "Get-All" endpoint',
+                client=self,
+                endpoint_path=path,
+            )
+            log_exception(error)
+            raise error
 
         result: list = json_response_data["SearchResult"]["resources"]
 

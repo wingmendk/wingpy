@@ -15,7 +15,7 @@ from packaging.version import Version
 
 from wingpy.base import HttpResponsePattern, RestApiBaseClass
 from wingpy.exceptions import UnsupportedMethodError
-from wingpy.logging import logger
+from wingpy.logger import log_exception, logger
 
 
 class CiscoFMC(RestApiBaseClass):
@@ -481,7 +481,7 @@ class CiscoFMC(RestApiBaseClass):
         )
         return response
 
-    def patch(self):
+    def patch(self, *args, **kwargs):
         """
         !!! failure "HTTP PATCH is not supported by FMC"
 
@@ -489,7 +489,9 @@ class CiscoFMC(RestApiBaseClass):
         ------
         UnsupportedMethodError
         """
-        raise UnsupportedMethodError("FMC does not support PATCH requests")
+        error = UnsupportedMethodError(client=self, method="PATCH")
+        log_exception(error)
+        raise error
 
     def delete(
         self,

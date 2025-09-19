@@ -56,7 +56,7 @@ class TaskRunner:
         self.loop: asyncio.AbstractEventLoop = asyncio.new_event_loop()
         """The event loop used to manage asynchronous tasks."""
 
-        self.tasks: set = set()
+        self.tasks: set[asyncio.Task[Any]] = set()
         """A set of scheduled asyncio tasks."""
 
         self._lock: threading.Lock = threading.Lock()
@@ -478,9 +478,9 @@ class RequestThrottler:
 
         # Filter out requests outside of the maximum request number
         # e.g. if the rate limit is 120 requests in 60 seconds, we only care about the last 120 requests
-        logs_resulting_in_rate_limiting = logs_in_rate_limit_period[
-            -self.rate_limit_max_requests :
-        ]
+        logs_resulting_in_rate_limiting: list[RequestLogEntry] = (
+            logs_in_rate_limit_period[-self.rate_limit_max_requests :]
+        )
 
         # Calculate the number of requests in the rate limit period
         run_rate = len(logs_resulting_in_rate_limiting)

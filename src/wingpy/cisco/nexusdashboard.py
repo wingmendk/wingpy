@@ -12,7 +12,7 @@ from packaging.version import Version
 
 from wingpy.base import RestApiBaseClass
 from wingpy.exceptions import AuthenticationFailure, UnexpectedPayloadError
-from wingpy.logging import logger
+from wingpy.logger import log_exception, logger
 
 
 class CiscoNexusDashboard(RestApiBaseClass):
@@ -237,10 +237,19 @@ class CiscoNexusDashboard(RestApiBaseClass):
     def _after_auth(self, **kwargs) -> None:
         """
         Handle meta data retrieval after authentication.
+
+        Raises
+        ------
+        AuthenticationFailure
+            If no authentication token is available after authentication.
         """
 
         if not self.is_authenticated:
-            raise AuthenticationFailure("Authentication required before use")
+            error = AuthenticationFailure(
+                message="No authentication token available after authentication."
+            )
+            log_exception(error)
+            raise error
 
     def get(
         self,
@@ -562,9 +571,12 @@ class CiscoNexusDashboard(RestApiBaseClass):
         total = json_response_data.get("meta", {}).get("counts", {}).get("total")
 
         if not isinstance(total, int):
-            raise UnexpectedPayloadError(
-                "Integer not found in meta.counts.total for paginated endpoint"
+            error = UnexpectedPayloadError(
+                "Integer not found in meta.counts.total for paginated endpoint",
+                response=first_page,
             )
+            log_exception(error)
+            raise error
 
         result_key = None
 
@@ -575,7 +587,13 @@ class CiscoNexusDashboard(RestApiBaseClass):
                 break
 
         if not result_key:
-            raise UnexpectedPayloadError("No lists for pagination found in payload")
+            error = UnexpectedPayloadError(
+                "No lists for pagination found in payload",
+                client=self,
+                response=first_page,
+            )
+            log_exception(error)
+            raise error
 
         result: list = json_response_data[result_key]
 
