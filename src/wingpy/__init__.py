@@ -15,6 +15,7 @@ from wingpy.cisco import (
     CiscoISE,
     CiscoMerakiDashboard,
     CiscoNexusDashboard,
+    CiscoVmanage,
 )
 from wingpy.generic import GenericRESTAPI
 from wingpy.logger import log_to_file, set_logging_level
@@ -30,6 +31,7 @@ __all__ = [
     "CiscoHyperfabric",
     "CiscoMerakiDashboard",
     "CiscoNexusDashboard",
+    "CiscoVmanage",
     "RestApiBaseClass",
     "set_logging_level",
     "log_to_file",

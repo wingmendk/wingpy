@@ -589,7 +589,6 @@ class CiscoNexusDashboard(RestApiBaseClass):
         if not result_key:
             error = UnexpectedPayloadError(
                 "No lists for pagination found in payload",
-                client=self,
                 response=first_page,
             )
             log_exception(error)
