@@ -22,16 +22,19 @@ Plenty of examples and explanations are available in the [User Guide](https://wi
 ## Installation
 
 ### Install via uv
+
 ```bash
 uv add wingpy
 ```
 
 ### Install via pip
+
 ```bash
 pip install wingpy
 ```
 
 ### Install via poetry
+
 ```bash
 poetry add wingpy
 ```
