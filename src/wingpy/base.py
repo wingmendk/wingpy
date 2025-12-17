@@ -9,6 +9,7 @@ import re
 import threading
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
+from importlib import metadata
 from ssl import SSLContext
 from typing import ClassVar, get_type_hints
 from urllib.parse import urlparse
@@ -238,6 +239,11 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
         A dictionary of HTTP headers to be sent with each request.
         These headers will be merged with any `headers` dict passed to an individual request.
         """
+        try:
+            version = metadata.version("wingpy")
+        except metadata.PackageNotFoundError:
+            version = "unknown"
+        self.headers["User-Agent"] = f"Wingpy/{version} WingmenSolutionsApS"
 
         self.request_index: int = 0
         """
