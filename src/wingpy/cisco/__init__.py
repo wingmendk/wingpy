@@ -6,6 +6,7 @@
 
 from wingpy.cisco.apic import CiscoAPIC
 from wingpy.cisco.catalystcenter import CiscoCatalystCenter
+from wingpy.cisco.cml import CiscoModelingLabs
 from wingpy.cisco.fmc import CiscoFMC
 from wingpy.cisco.hyperfabric import CiscoHyperfabric
 from wingpy.cisco.ise import CiscoISE
@@ -16,6 +17,7 @@ from wingpy.cisco.vmanage import CiscoVmanage
 __all__ = [
     "CiscoAPIC",
     "CiscoCatalystCenter",
+    "CiscoModelingLabs",
     "CiscoFMC",
     "CiscoISE",
     "CiscoHyperfabric",

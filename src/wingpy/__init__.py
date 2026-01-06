@@ -14,6 +14,7 @@ from wingpy.cisco import (
     CiscoHyperfabric,
     CiscoISE,
     CiscoMerakiDashboard,
+    CiscoModelingLabs,
     CiscoNexusDashboard,
     CiscoVmanage,
 )
@@ -30,6 +31,7 @@ __all__ = [
     "GenericRESTAPI",
     "CiscoHyperfabric",
     "CiscoMerakiDashboard",
+    "CiscoModelingLabs",
     "CiscoNexusDashboard",
     "CiscoVmanage",
     "RestApiBaseClass",
