@@ -21,7 +21,8 @@ from typing import Any, ParamSpec, TypeVar
 
 import arrow
 import httpx
-from loguru import logger
+
+from wingpy.logger import logger
 
 
 @dataclass

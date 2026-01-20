@@ -20,7 +20,7 @@ from wingpy.cisco import (
 )
 from wingpy.generic import GenericRESTAPI
 from wingpy.logger import log_to_file, set_logging_level
-from wingpy.nsot import NetBox
+from wingpy.nsot import Nautobot, NetBox
 
 __version__ = metadata.version("wingpy")
 
@@ -35,6 +35,7 @@ __all__ = [
     "CiscoModelingLabs",
     "CiscoNexusDashboard",
     "CiscoVmanage",
+    "Nautobot",
     "NetBox",
     "RestApiBaseClass",
     "set_logging_level",

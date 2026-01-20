@@ -15,9 +15,9 @@ from wingpy.exceptions import AuthenticationFailure, InvalidEndpointError
 from wingpy.logger import log_exception, logger
 
 
-class NetBox(RestApiBaseClass):
+class Nautobot(RestApiBaseClass):
     """
-    Interact with the NetBox API.
+    Interact with the Nautobot API.
 
     Parameters
     ----------
@@ -25,12 +25,12 @@ class NetBox(RestApiBaseClass):
     base_url : str | None, default=None
         Base URL of the API including `https://`.
 
-        Overrides the environment variable `WINGPY_NETBOX_BASE_URL`.
+        Overrides the environment variable `WINGPY_NAUTOBOT_BASE_URL`.
 
     token : str | None, default=None
         Password for API authentication.
 
-        Overrides the environment variable `WINGPY_NETBOX_TOKEN`.
+        Overrides the environment variable `WINGPY_NAUTOBOT_TOKEN`.
 
     verify : bool | SSLContext, default=True
         Boolean values will enable or disable the default SSL verification.
@@ -43,26 +43,29 @@ class NetBox(RestApiBaseClass):
     retries : int, default=3
         Number of failed HTTP attempts allowed before raising httpx.HTTPStatusError exception.
 
+    api_version: str | None, default=None
+        Use a specific default version of the API using the HTTP Accept header.
+
     Examples
     --------
     ```python
-    from wingpy import NetBox
-    netbox = NetBox(
-        base_url="http://netbox.example.com",
+    from wingpy import Nautobot
+    nautobot = Nautobot(
+        base_url="http://nautobot.example.com",
         token="0123456789abcdef0123456789abcdef01234567",
     )
-    netbox.get("/api/status/")
+    nautobot.get("/api/status/")
     ```
     """
 
     RETRY_RESPONSES = []
     """
-    No explicit retry reponses are defined for NetBox.
+    No explicit retry reponses are defined for Nautobot.
     """
 
     MAX_CONNECTIONS = 6
     """
-    The maximum number of concurrent connections opened to the NetBox.
+    The maximum number of concurrent connections opened to the Nautobot.
     
     1 connection will be used for general synchronous requests.
     
@@ -77,19 +80,20 @@ class NetBox(RestApiBaseClass):
         verify: SSLContext | bool = True,
         timeout: int = 10,
         retries: int = 3,
+        api_version: str | None = None,
     ):
         # Allow parameters to be passed directly or fallback to environment variables
-        self.netbox_url = base_url or os.getenv("WINGPY_NETBOX_BASE_URL")
+        self.nautobot_url = base_url or os.getenv("WINGPY_NAUTOBOT_BASE_URL")
         """
-        The base URL for the NetBox API.
+        The base URL for the Nautobot API.
 
-        If not provided, it will be read from the environment variable `WINGPY_NETBOX_BASE_URL`.
+        If not provided, it will be read from the environment variable `WINGPY_NAUTOBOT_BASE_URL`.
         """
 
-        self.token = token or os.getenv("WINGPY_NETBOX_TOKEN")
+        self.token = token or os.getenv("WINGPY_NAUTOBOT_TOKEN")
         """
         The API token for authentication.
-        If not provided, it will be read from the environment variable `WINGPY_NETBOX_TOKEN`.
+        If not provided, it will be read from the environment variable `WINGPY_NAUTOBOT_TOKEN`.
         """
 
         if not self.token:
@@ -97,18 +101,23 @@ class NetBox(RestApiBaseClass):
                 "API token must be provided either as argument or environment variable"
             )
 
-        if not self.netbox_url:
+        if not self.nautobot_url:
             raise ValueError(
-                "NetBox base_url must be provided either as argument or environment variable"
+                "Nautobot base_url must be provided either as argument or environment variable"
             )
 
         self.version: Version = Version("0.0")
         """
-        The version of the NetBox API.
+        The version of the Nautobot API.
+        """
+
+        self.api_version = api_version
+        """
+        Default Nautobot API version to request using the HTTP Accept header.
         """
 
         super().__init__(
-            base_url=self.netbox_url,
+            base_url=self.nautobot_url,
             verify=verify,
             headers={
                 "Content-Type": "application/json",
@@ -117,6 +126,10 @@ class NetBox(RestApiBaseClass):
             timeout=timeout,
             retries=retries,
         )
+
+        if api_version:
+            logger.info(f"Setting default API version to {self.api_version}")
+            self.headers["Accept"] += f"; version={self.api_version}"
 
     def _authenticate(self) -> None:
         """
@@ -128,7 +141,7 @@ class NetBox(RestApiBaseClass):
 
         See also
         --------
-        For proactive authentication see [`NetBox.authenticate()`](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.authenticate)
+        For proactive authentication see [`Nautobot.authenticate()`](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.authenticate)
 
         Returns
         -------
@@ -168,23 +181,23 @@ class NetBox(RestApiBaseClass):
         )
 
         if response.status_code == 200:
-            version = response.json().get("netbox-version", "0.0")
+            version = response.json().get("nautobot-version", "0.0")
             self.version = Version(version)
-            logger.info(f"NetBox version: {self.version} detected")
+            logger.info(f"Nautobot version: {self.version} detected")
         elif response.status_code == 403:
             error = AuthenticationFailure("Authentication failed", response=response)
             log_exception(error)
             raise error
         else:
-            logger.info("Unable to detect NetBox version")
+            logger.info("Unable to detect Nautobot version")
 
     def _validate_path(self, path: str) -> None:
         if not path.startswith("/"):
-            error = InvalidEndpointError("NetBox endpoint paths must begin with /")
+            error = InvalidEndpointError("Nautobot endpoint paths must begin with /")
             log_exception(error)
             raise error
         if not path.endswith("/"):
-            error = InvalidEndpointError("NetBox endpoint paths must end with /")
+            error = InvalidEndpointError("Nautobot endpoint paths must end with /")
             log_exception(error)
             raise error
 
@@ -196,6 +209,7 @@ class NetBox(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
+        api_version: str | None = None,
     ) -> httpx.Response:
         """
         Send an HTTP `GET` request to the specified path.
@@ -211,15 +225,18 @@ class NetBox(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{id}` in the URL path with actual values.
 
-            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.path_params) before sending request.
+            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.headers) before sending request.
+            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.timeout) for a single request.
+            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.timeout) for a single request.
+
+        api_version: str | None, default=None
+            Use a specific version of the API using the HTTP Accept header.
 
         Returns
         -------
@@ -228,6 +245,15 @@ class NetBox(RestApiBaseClass):
         """
 
         self._validate_path(path)
+
+        if isinstance(headers, dict):
+            headers = headers.copy()
+        else:
+            headers = {}
+
+        if api_version:
+            logger.info(f"Setting API version to {api_version}")
+            headers["Accept"] = f"application/json; version={api_version}"
 
         response = self.request(
             "GET",
@@ -250,6 +276,7 @@ class NetBox(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
+        api_version: str | None = None,
     ) -> httpx.Response:
         """
         Send an HTTP `POST` request to the specified path.
@@ -265,15 +292,18 @@ class NetBox(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{id}` in the URL path with actual values.
 
-            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.path_params) before sending request.
+            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.headers) before sending request.
+            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.timeout) for a single request.
+            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.timeout) for a single request.
+
+        api_version: str | None, default=None
+            Use a specific version of the API using the HTTP Accept header.
 
         Returns
         -------
@@ -282,6 +312,15 @@ class NetBox(RestApiBaseClass):
         """
 
         self._validate_path(path)
+
+        if isinstance(headers, dict):
+            headers = headers.copy()
+        else:
+            headers = {}
+
+        if api_version:
+            logger.info(f"Setting API version to {api_version}")
+            headers["Accept"] = f"application/json; version={api_version}"
 
         response = self.request(
             "POST",
@@ -305,6 +344,7 @@ class NetBox(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
+        api_version: str | None = None,
     ) -> httpx.Response:
         """
         Send an HTTP `PUT` request to the specified path.
@@ -320,15 +360,18 @@ class NetBox(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{id}` in the URL path with actual values.
 
-            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.path_params) before sending request.
+            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.headers) before sending request.
+            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.timeout) for a single request.
+            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.timeout) for a single request.
+
+        api_version: str | None, default=None
+            Use a specific version of the API using the HTTP Accept header.
 
         Returns
         -------
@@ -337,6 +380,15 @@ class NetBox(RestApiBaseClass):
         """
 
         self._validate_path(path)
+
+        if isinstance(headers, dict):
+            headers = headers.copy()
+        else:
+            headers = {}
+
+        if api_version:
+            logger.info(f"Setting API version to {api_version}")
+            headers["Accept"] = f"application/json; version={api_version}"
 
         response = self.request(
             "PUT",
@@ -360,6 +412,7 @@ class NetBox(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
+        api_version: str | None = None,
     ) -> httpx.Response:
         """
         Send an HTTP `PATCH` request to the specified path.
@@ -375,15 +428,18 @@ class NetBox(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{id}` in the URL path with actual values.
 
-            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.path_params) before sending request.
+            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.headers) before sending request.
+            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.timeout) for a single request.
+            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.timeout) for a single request.
+
+        api_version: str | None, default=None
+            Use a specific version of the API using the HTTP Accept header.
 
         Returns
         -------
@@ -392,6 +448,15 @@ class NetBox(RestApiBaseClass):
         """
 
         self._validate_path(path)
+
+        if isinstance(headers, dict):
+            headers = headers.copy()
+        else:
+            headers = {}
+
+        if api_version:
+            logger.info(f"Setting API version to {api_version}")
+            headers["Accept"] = f"application/json; version={api_version}"
 
         response = self.request(
             "PATCH",
@@ -414,6 +479,7 @@ class NetBox(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
+        api_version: str | None = None,
     ) -> httpx.Response:
         """
         Send an HTTP `DELETE` request to the specified path.
@@ -426,15 +492,18 @@ class NetBox(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{id}` in the URL path with actual values.
 
-            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.path_params) before sending request.
+            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.headers) before sending request.
+            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.timeout) for a single request.
+            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.timeout) for a single request.
+
+        api_version: str | None, default=None
+            Use a specific version of the API using the HTTP Accept header.
 
         Returns
         -------
@@ -443,6 +512,15 @@ class NetBox(RestApiBaseClass):
         """
 
         self._validate_path(path)
+
+        if isinstance(headers, dict):
+            headers = headers.copy()
+        else:
+            headers = {}
+
+        if api_version:
+            logger.info(f"Setting API version to {api_version}")
+            headers["Accept"] = f"application/json; version={api_version}"
 
         response = self.request(
             "DELETE",
@@ -467,6 +545,7 @@ class NetBox(RestApiBaseClass):
         headers: dict | None = None,
         timeout: int | None = None,
         page_size: int = 100,
+        api_version: str | None = None,
     ) -> list:
         """
         Retrieves all pages of data from a `GET` endpoint using maximum concurrency.
@@ -482,26 +561,38 @@ class NetBox(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{objectId}` in the URL path with actual values.
 
-            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.path_params) before sending request.
+            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.headers) before sending request.
+            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.timeout) for a single request.
+            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.timeout) for a single request.
 
         page_size : int, default=100
             The number of items to retrieve per page. Recommended maximum value: 1000.
+
+        api_version: str | None, default=None
+            Use a specific version of the API using the HTTP Accept header.
 
         Returns
         -------
         list[dict]
             A concatenated list of returned dictionaries from all pages.
 
-            Similar to the `response` key in the NetBox API JSON responses.
+            Similar to the `response` key in the Nautobot API JSON responses.
         """
+
+        if isinstance(headers, dict):
+            headers = headers.copy()
+        else:
+            headers = {}
+
+        if api_version:
+            logger.info(f"Setting API version to {api_version}")
+            headers["Accept"] = f"application/json; version={api_version}"
 
         first_page = self.get_page(
             path,
@@ -551,6 +642,7 @@ class NetBox(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
+        api_version: str | None = None,
     ) -> httpx.Response:
         """
         Retrieves a specific page of data from a `GET` endpoint.
@@ -572,15 +664,18 @@ class NetBox(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{objectId}` in the URL path with actual values.
 
-            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.path_params) before sending request.
+            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.headers) before sending request.
+            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/netbox/#wingpy.nsot.netbox.NetBox.timeout) for a single request.
+            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/nautobot/#wingpy.nsot.nautobot.Nautobot.timeout) for a single request.
+
+        api_version: str | None, default=None
+            Use a specific version of the API using the HTTP Accept header.
 
         Returns
         -------
