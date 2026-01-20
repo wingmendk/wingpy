@@ -1,6 +1,6 @@
 [project]
 name = "wingpy"
-version = "1.4.2"
+version = "1.5.0"
 description = "API client library built for network engineers."
 readme = "README.md"
 authors = [
