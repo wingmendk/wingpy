@@ -12,7 +12,6 @@ import re
 from ssl import SSLContext
 from urllib.parse import urlparse
 
-import httpx
 from lxml import etree
 from packaging.version import Version
 
@@ -22,6 +21,7 @@ from wingpy.exceptions import (
     InvalidResponseError,
     UnsupportedMethodError,
 )
+from wingpy.response import ResponseMapping, ResponseSequence, XMLResponseMapping
 from wingpy.logger import log_exception, logger
 
 
@@ -162,7 +162,7 @@ class CiscoAPIC(RestApiBaseClass):
         The current token for the APIC API.
         """
 
-    def _authenticate(self) -> httpx.Response:
+    def _authenticate(self) -> ResponseMapping:
         """
         Retrieves and stores an `APIC-Cookie` cookie header by authenticating
         with the APIC API using the provided username and password.
@@ -177,7 +177,7 @@ class CiscoAPIC(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
+        ResponseMapping
             The response object from the authentication request.
         """
 
@@ -290,7 +290,7 @@ class CiscoAPIC(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | XMLResponseMapping | ResponseSequence:
         """
         Send an HTTP `GET` request to the specified path.
 
@@ -317,8 +317,10 @@ class CiscoAPIC(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence | XMLResponseMapping
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping),
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence), or
+            [`XMLResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.XMLResponseMapping) object from the request.
         """
 
         response = self.request(
@@ -342,7 +344,7 @@ class CiscoAPIC(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | XMLResponseMapping | ResponseSequence:
         """
         Send an HTTP `POST` request to the specified path.
 
@@ -369,8 +371,10 @@ class CiscoAPIC(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence | XMLResponseMapping
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping),
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence), or
+            [`XMLResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.XMLResponseMapping) object from the request.
         """
 
         if isinstance(data, (dict, list)) and not path.endswith(".json"):
@@ -424,7 +428,7 @@ class CiscoAPIC(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | XMLResponseMapping | ResponseSequence:
         """
         Send an HTTP `DELETE` request to the specified path.
 
@@ -451,8 +455,10 @@ class CiscoAPIC(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence | XMLResponseMapping
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping),
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence), or
+            [`XMLResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.XMLResponseMapping) object from the request.
         """
 
         response = self.request(
@@ -725,7 +731,7 @@ class CiscoAPIC(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Retrieves a specific page of data from a JSON path.
 
@@ -758,8 +764,9 @@ class CiscoAPIC(RestApiBaseClass):
 
         Returns
         -------
-        httx.Response
-            The response object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request, depending on the content.
         """
 
         merged_params = {}
@@ -813,7 +820,7 @@ class CiscoAPIC(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> XMLResponseMapping:
         """
         Retrieves a specific page of data from an XML path.
 
@@ -846,8 +853,8 @@ class CiscoAPIC(RestApiBaseClass):
 
         Returns
         -------
-        httx.Response
-            The response object from the request.
+        XMLResponseMapping
+            The [`XMLResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.XMLResponseMapping) object from the request.
         """
 
         merged_params = {}
@@ -857,7 +864,7 @@ class CiscoAPIC(RestApiBaseClass):
         merged_params["page-size"] = page_size
         merged_params["page"] = page
 
-        xml_response = self.get(
+        xml_response: XMLResponseMapping = self.get(
             path,
             params=merged_params,
             path_params=path_params,

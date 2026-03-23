@@ -27,6 +27,12 @@ from wingpy.exceptions import (
 from wingpy.interfaces import ApiClient
 from wingpy.logger import log_exception, logger
 from wingpy.scheduling import RequestLogEntry, RequestThrottler, TaskRunner
+from wingpy.response import (
+    convert_response,
+    ResponseMapping,
+    ResponseSequence,
+    XMLResponseMapping,
+)
 
 
 @dataclass
@@ -360,7 +366,7 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence | XMLResponseMapping:
         """
         Abstract method to send a POST request to the API server.
 
@@ -378,7 +384,7 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence | XMLResponseMapping:
         """
         Abstract method to send a PUT request to the API server.
 
@@ -396,7 +402,7 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence | XMLResponseMapping:
         """
         Abstract method to send a PATCH request to the API server.
 
@@ -413,7 +419,7 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence | XMLResponseMapping:
         """
         Abstract method to send a DELETE request to the API server.
 
@@ -443,7 +449,9 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
 
         self._after_auth(auth_response=auth_response)
 
-    def _after_auth(self, *, auth_response: httpx.Response):
+    def _after_auth(
+        self, *, auth_response: ResponseMapping | ResponseSequence | XMLResponseMapping
+    ):
         """
         Overload this method to perform any actions after authentication.
 
@@ -531,7 +539,7 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
         request_log_prefix: str,
         response_log_prefix: str,
         auth: httpx.Auth | None = None,
-    ) -> tuple[httpx.Response, arrow.Arrow]:
+    ) -> tuple[ResponseSequence | ResponseMapping | XMLResponseMapping, arrow.Arrow]:
         """
         Ensures synchronized logging and error handling while seding a request.
 
@@ -548,7 +556,7 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
 
         Returns
         -------
-        tuple[httpx.Response, arrow.Arrow]
+        tuple[ResponseSequence | ResponseMapping | XMLResponseMapping, arrow.Arrow]
             A tuple containing the response object and the request timestamp.
         """
 
@@ -592,14 +600,14 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
             logger.trace(f"{response_log_prefix} headers: {response_header_json}")
             logger.trace(f"{response_log_prefix} body: {response.text}")
 
-        return response, request_time
+        return convert_response(response), request_time
 
     def _send_request_with_retry(
         self,
         request: httpx.Request,
         is_auth_endpoint: bool = False,
         auth: httpx.Auth | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence | XMLResponseMapping:
         """
         Send a request to the API server and handle special-case response.
 
@@ -617,14 +625,14 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
 
         Returns
         -------
-        httpx.Response
+        ResponseMapping | ResponseSequence | XMLResponseMapping
             The response object returned by the API server.
         """
         max_attempts = self.retries + 1
         attempt = 0
         self.request_index += 1
         request_index = self.request_index
-        response: httpx.Response | None = None
+        response: ResponseMapping | ResponseSequence | XMLResponseMapping | None = None
         request_log_prefix = ""
 
         rate_limited_retry = False
@@ -697,7 +705,11 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
         log_exception(error, severity="ERROR")
         raise error
 
-    def is_retry_response(self, response: httpx.Response, method: str) -> bool:
+    def is_retry_response(
+        self,
+        response: ResponseMapping | ResponseSequence | XMLResponseMapping,
+        method: str,
+    ) -> bool:
         result = False
         for retry_reponse in self.RETRY_RESPONSES:
             if (
@@ -723,7 +735,7 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
         timeout: int,
         is_auth_endpoint: bool,
         auth: httpx.Auth | None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence | XMLResponseMapping:
         """
         Send any type of HTTP request and receive response.
 
@@ -761,7 +773,7 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
 
         Returns
         -------
-        httpx.Response
+        ResponseMapping | ResponseSequence | XMLResponseMapping
             The response object returned by the API server.
         """
 

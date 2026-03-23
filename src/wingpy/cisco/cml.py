@@ -10,12 +10,12 @@ import os
 from ssl import SSLContext
 
 import arrow
-import httpx
 from packaging.version import Version
 
 from wingpy.base import RestApiBaseClass
 from wingpy.exceptions import AuthenticationFailure, UnsupportedMethodError
 from wingpy.logger import log_exception, logger
+from wingpy.response import ResponseMapping, ResponseSequence
 
 
 class CiscoModelingLabs(RestApiBaseClass):
@@ -150,7 +150,7 @@ class CiscoModelingLabs(RestApiBaseClass):
             retries=retries,
         )
 
-    def _authenticate(self) -> httpx.Response:
+    def _authenticate(self) -> ResponseMapping:
         """
         Retrieves and stores a bearer token by authenticating with the
         Cisco Modeling Labs API using the provided username and password as JSON payload.
@@ -165,7 +165,7 @@ class CiscoModelingLabs(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
+        ResponseMapping
             The response object from the authentication request.
         """
 
@@ -253,7 +253,7 @@ class CiscoModelingLabs(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `GET` request to the specified path.
 
@@ -280,8 +280,9 @@ class CiscoModelingLabs(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -305,7 +306,7 @@ class CiscoModelingLabs(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `POST` request to the specified path.
 
@@ -332,8 +333,9 @@ class CiscoModelingLabs(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -358,7 +360,7 @@ class CiscoModelingLabs(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `PUT` request to the specified path.
 
@@ -385,8 +387,9 @@ class CiscoModelingLabs(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -411,7 +414,7 @@ class CiscoModelingLabs(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `PATCH` request to the specified path.
 
@@ -420,7 +423,7 @@ class CiscoModelingLabs(RestApiBaseClass):
         path : str
             The API endpoint path to send the request to.
 
-        data : str | dict | list
+        data : str | dict | list | None
             Request payload as JSON string or Python list/dict object.
 
         path_params : dict | None, default=None
@@ -438,8 +441,9 @@ class CiscoModelingLabs(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -463,7 +467,7 @@ class CiscoModelingLabs(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `DELETE` request to the specified path.
 
@@ -487,8 +491,9 @@ class CiscoModelingLabs(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -513,7 +518,7 @@ class CiscoModelingLabs(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> list:
+    ) -> list[dict]:
         """
         Retrieves all data items from a `GET` endpoint.
 

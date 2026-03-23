@@ -15,6 +15,7 @@ from packaging.version import Version
 from wingpy.base import RestApiBaseClass
 from wingpy.exceptions import InvalidEndpointError
 from wingpy.logger import log_exception, logger
+from wingpy.response import ResponseMapping, ResponseSequence, XMLResponseMapping
 
 
 class CiscoISE(RestApiBaseClass):
@@ -199,7 +200,7 @@ class CiscoISE(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence | XMLResponseMapping:
         """
         Send an HTTP `GET` request to the specified path.
 
@@ -226,8 +227,10 @@ class CiscoISE(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence | XMLResponseMapping
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping),
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence), or
+            [`XMLResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.XMLResponseMapping) object from the request.
         """
 
         merged_headers = self.headers.copy()
@@ -256,7 +259,7 @@ class CiscoISE(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence | XMLResponseMapping:
         """
         Send an HTTP `POST` request to the specified path.
 
@@ -283,8 +286,10 @@ class CiscoISE(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence | XMLResponseMapping
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping),
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence), or
+            [`XMLResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.XMLResponseMapping) object from the request.
         """
 
         merged_headers = self.headers.copy()
@@ -314,7 +319,7 @@ class CiscoISE(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence | XMLResponseMapping:
         """
         Send an HTTP `PUT` request to the specified path.
 
@@ -341,8 +346,10 @@ class CiscoISE(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence | XMLResponseMapping
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping),
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence), or
+            [`XMLResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.XMLResponseMapping) object from the request.
         """
 
         merged_headers = self.headers.copy()
@@ -372,7 +379,7 @@ class CiscoISE(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence | XMLResponseMapping:
         """
         Send an HTTP `PATCH` request to the specified path.
 
@@ -399,8 +406,10 @@ class CiscoISE(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence | XMLResponseMapping
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping),
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence), or
+            [`XMLResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.XMLResponseMapping) object from the request.
         """
 
         merged_headers = self.headers.copy()
@@ -430,7 +439,7 @@ class CiscoISE(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence | XMLResponseMapping:
         """
         Send an HTTP `DELETE` request to the specified path.
 
@@ -457,8 +466,10 @@ class CiscoISE(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence | XMLResponseMapping
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping),
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence), or
+            [`XMLResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.XMLResponseMapping) object from the request.
         """
 
         merged_headers = self.headers.copy()
@@ -783,7 +794,7 @@ class CiscoISE(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence | XMLResponseMapping:
         """
         Retrieves a specific page of data from a JSON path.
 
@@ -816,8 +827,10 @@ class CiscoISE(RestApiBaseClass):
 
         Returns
         -------
-        httx.Response
-            The response object from the request.
+        ResponseMapping | ResponseSequence | XMLResponseMapping
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping),
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence), or
+            [`XMLResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.XMLResponseMapping) object from the request.
         """
 
         merged_params = {}

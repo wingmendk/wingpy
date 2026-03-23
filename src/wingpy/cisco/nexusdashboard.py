@@ -7,12 +7,12 @@
 import os
 from ssl import SSLContext
 
-import httpx
 from packaging.version import Version
 
 from wingpy.base import RestApiBaseClass
 from wingpy.exceptions import AuthenticationFailure, UnexpectedPayloadError
 from wingpy.logger import log_exception, logger
+from wingpy.response import ResponseMapping, ResponseSequence
 
 
 class CiscoNexusDashboard(RestApiBaseClass):
@@ -171,7 +171,7 @@ class CiscoNexusDashboard(RestApiBaseClass):
             retries=retries,
         )
 
-    def _authenticate(self) -> httpx.Response:
+    def _authenticate(self) -> ResponseMapping | None:
         """
         Retrieves and stores an `X-auth-token` cookie header by authenticating
         with the Cisco Nexus Dashboard API using the provided username and password.
@@ -186,8 +186,8 @@ class CiscoNexusDashboard(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The response object from the authentication request.
+        ResponseMapping | None
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) object from the authentication request, or `None` if API key authentication is used.
         """
 
         if not self.username:
@@ -221,7 +221,7 @@ class CiscoNexusDashboard(RestApiBaseClass):
         elif self.apikey:
             self.headers["X-Nd-Username"] = self.username
             self.headers["X-Nd-Apikey"] = self.apikey
-            return
+            return None
 
         # Key or password not supplied
         else:
@@ -259,7 +259,7 @@ class CiscoNexusDashboard(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `GET` request to the specified path.
 
@@ -286,8 +286,9 @@ class CiscoNexusDashboard(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -311,7 +312,7 @@ class CiscoNexusDashboard(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `POST` request to the specified path.
 
@@ -338,8 +339,9 @@ class CiscoNexusDashboard(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -364,7 +366,7 @@ class CiscoNexusDashboard(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `PUT` request to the specified path.
 
@@ -391,8 +393,9 @@ class CiscoNexusDashboard(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -417,7 +420,7 @@ class CiscoNexusDashboard(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `PATCH` request to the specified path.
 
@@ -444,8 +447,9 @@ class CiscoNexusDashboard(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -469,7 +473,7 @@ class CiscoNexusDashboard(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `DELETE` request to the specified path.
 
@@ -493,8 +497,9 @@ class CiscoNexusDashboard(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -520,7 +525,7 @@ class CiscoNexusDashboard(RestApiBaseClass):
         headers: dict | None = None,
         timeout: int | None = None,
         page_size: int = 10000,
-    ) -> list:
+    ) -> list[dict]:
         """
         Retrieves all pages of data from a `GET` endpoint using maximum concurrency.
 
@@ -633,7 +638,7 @@ class CiscoNexusDashboard(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Retrieves a specific page of data from a `GET` endpoint.
 
@@ -666,8 +671,9 @@ class CiscoNexusDashboard(RestApiBaseClass):
 
         Returns
         -------
-        httx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         if isinstance(params, dict):

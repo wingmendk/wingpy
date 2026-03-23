@@ -12,6 +12,7 @@ from packaging.version import Version
 
 from wingpy.base import RestApiBaseClass
 from wingpy.exceptions import AuthenticationFailure, UnsupportedMethodError
+from wingpy.response import ResponseMapping, ResponseSequence
 from wingpy.logger import log_exception, logger
 
 
@@ -142,7 +143,7 @@ class CiscoCatalystCenter(RestApiBaseClass):
             retries=retries,
         )
 
-    def _authenticate(self) -> httpx.Response:
+    def _authenticate(self) -> ResponseMapping:
         """
         Retrieves and stores an `X-auth-token` cookie header by authenticating
         with the Catalyst Center API using the provided username and password.
@@ -153,12 +154,12 @@ class CiscoCatalystCenter(RestApiBaseClass):
 
         See also
         --------
-        For proactive authentication see [`CiscoCatalystCenter.authenticate()`](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.authenticate)
+        For proactive authentication see [`CiscoCatalystCenter.authenticate()`](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.authenticate)
 
         Returns
         -------
-        httpx.Response
-            The response object from the authentication request.
+        ResponseMapping
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) object from the request.
         """
 
         if not self.username or not self.password:
@@ -225,7 +226,7 @@ class CiscoCatalystCenter(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `GET` request to the specified path.
 
@@ -240,20 +241,21 @@ class CiscoCatalystCenter(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{siteId}` in the URL path with actual values.
 
-            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.path_params) before sending request.
+            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.headers) before sending request.
+            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.timeout) for a single request.
+            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.timeout) for a single request.
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence)
+            object from the request.
         """
 
         response = self.request(
@@ -277,7 +279,7 @@ class CiscoCatalystCenter(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `POST` request to the specified path.
 
@@ -292,20 +294,21 @@ class CiscoCatalystCenter(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{siteId}` in the URL path with actual values.
 
-            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.path_params) before sending request.
+            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.headers) before sending request.
+            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.timeout) for a single request.
+            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.timeout) for a single request.
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence)
+            object from the request.
         """
 
         response = self.request(
@@ -330,7 +333,7 @@ class CiscoCatalystCenter(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `PUT` request to the specified path.
 
@@ -345,20 +348,21 @@ class CiscoCatalystCenter(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{siteId}` in the URL path with actual values.
 
-            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.path_params) before sending request.
+            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.headers) before sending request.
+            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.timeout) for a single request.
+            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.timeout) for a single request.
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence)
+            object from the request.
         """
 
         response = self.request(
@@ -394,7 +398,7 @@ class CiscoCatalystCenter(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `DELETE` request to the specified path.
 
@@ -406,20 +410,21 @@ class CiscoCatalystCenter(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{siteId}` in the URL path with actual values.
 
-            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.path_params) before sending request.
+            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.headers) before sending request.
+            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.timeout) for a single request.
+            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.timeout) for a single request.
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence)
+            object from the request.
         """
 
         response = self.request(
@@ -460,15 +465,15 @@ class CiscoCatalystCenter(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{objectId}` in the URL path with actual values.
 
-            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.path_params) before sending request.
+            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.headers) before sending request.
+            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.timeout) for a single request.
+            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.timeout) for a single request.
 
         page_size : int, default=500
             The number of items to retrieve per page.
@@ -497,7 +502,9 @@ class CiscoCatalystCenter(RestApiBaseClass):
                 timeout=timeout,
             )
             offset += page_size
-            page_reponse = page.json()["response"]
+            page_reponse = (
+                page["response"] if isinstance(page, ResponseMapping) else list(page)
+            )
             result += page_reponse
 
             if len(page_reponse) < page_size:
@@ -518,7 +525,7 @@ class CiscoCatalystCenter(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Retrieves a specific page of data from a `GET` endpoint.
 
@@ -539,20 +546,21 @@ class CiscoCatalystCenter(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{objectId}` in the URL path with actual values.
 
-            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.path_params) before sending request.
+            Will be combined with [self.path_params](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.headers) before sending request.
+            Will be combined with [self.headers](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/apic/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.timeout) for a single request.
+            Override the standard timeout timer [self.timeout](https://wingpy.automation.wingmen.dk/api/catalyst-center/#wingpy.cisco.catalystcenter.CiscoCatalystCenter.timeout) for a single request.
 
         Returns
         -------
-        httx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence)
+            object from the request.
         """
 
         if isinstance(params, dict):
@@ -574,7 +582,9 @@ class CiscoCatalystCenter(RestApiBaseClass):
 
         page = (offset // limit) + 1
 
-        page_reponse = rsp.json()["response"]
+        page_reponse = (
+            rsp["response"] if isinstance(rsp, ResponseMapping) else list(rsp)
+        )
         if len(page_reponse) > 0:
             logger.debug(f"Successfully retrieved page {page} from {path}")
         else:

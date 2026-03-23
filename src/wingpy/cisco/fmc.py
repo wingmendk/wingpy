@@ -16,6 +16,7 @@ from packaging.version import Version
 from wingpy.base import HttpResponsePattern, RestApiBaseClass
 from wingpy.exceptions import UnsupportedMethodError
 from wingpy.logger import log_exception, logger
+from wingpy.response import ResponseMapping, ResponseSequence
 
 
 class CiscoFMC(RestApiBaseClass):
@@ -178,7 +179,7 @@ class CiscoFMC(RestApiBaseClass):
         The current token for the FMC API.
         """
 
-    def _authenticate(self) -> httpx.Response:
+    def _authenticate(self) -> ResponseMapping | ResponseSequence:
         """
         Warnings
         --------
@@ -193,8 +194,9 @@ class CiscoFMC(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The response object from the authentication request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the authentication request.
         """
 
         parsed_url = urlparse(self.base_url)
@@ -307,7 +309,7 @@ class CiscoFMC(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `GET` request to the specified path.
 
@@ -336,8 +338,9 @@ class CiscoFMC(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -364,7 +367,7 @@ class CiscoFMC(RestApiBaseClass):
         timeout: int | None = None,
         auth: httpx.Auth | None = None,
         is_auth_endpoint: bool = False,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `POST` request to the specified path.
 
@@ -406,8 +409,9 @@ class CiscoFMC(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -432,7 +436,7 @@ class CiscoFMC(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `PUT` request to the specified path.
 
@@ -464,8 +468,9 @@ class CiscoFMC(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -501,7 +506,7 @@ class CiscoFMC(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `DELETE` request to the specified path.
 
@@ -530,8 +535,9 @@ class CiscoFMC(RestApiBaseClass):
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -653,7 +659,7 @@ class CiscoFMC(RestApiBaseClass):
         headers: dict | None = None,
         timeout: int | None = None,
         expanded: bool = False,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Retrieves a specific page of data from a `GET` endpoint.
 
@@ -692,8 +698,9 @@ class CiscoFMC(RestApiBaseClass):
 
         Returns
         -------
-        httx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         if isinstance(params, dict):

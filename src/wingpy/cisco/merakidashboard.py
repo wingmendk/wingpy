@@ -8,11 +8,11 @@ import os
 import re
 from ssl import SSLContext
 
-import httpx
 
 from wingpy.base import HttpResponsePattern, RestApiBaseClass
 from wingpy.exceptions import InvalidResponseError, UnsupportedMethodError
 from wingpy.logger import log_exception
+from wingpy.response import ResponseSequence, ResponseMapping
 
 
 class CiscoMerakiDashboard(RestApiBaseClass):
@@ -223,7 +223,7 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `GET` request to the specified path.
 
@@ -245,25 +245,26 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{fabricId}` in the URL path with actual values.
 
-            Will be combined with [`self.path_params`][wingpy.cisco.merakidashboard.CiscoMerakiDashboard.path_params] before sending request.
+            Will be combined with [`self.path_params`](https://wingpy.automation.wingmen.dk/api/meraki-dashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [`self.headers`][wingpy.cisco.merakidashboard.CiscoMerakiDashboard.headers] before sending request.
+            Will be combined with [`self.headers`](https://wingpy.automation.wingmen.dk/api/meraki-dashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [`self.timeout`][wingpy.cisco.merakidashboard.CiscoMerakiDashboard.timeout] for a single request.
+            Override the standard timeout timer [`self.timeout`](https://wingpy.automation.wingmen.dk/api/meraki-dashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.timeout) for a single request.
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
 
         Raises
         ------
         ValueError
-            If a query parameter value is a list but the parameter name does not end with `[]
+            If a query parameter value is a list but the parameter name does not end with `[]`.
         """
 
         if isinstance(params, dict):
@@ -295,7 +296,7 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `POST` request to the specified path.
 
@@ -310,20 +311,21 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{fabricId}` in the URL path with actual values.
 
-            Will be combined with [`self.path_params`][wingpy.cisco.merakidashboard.CiscoMerakiDashboard.path_params] before sending request.
+            Will be combined with [`self.path_params`](https://wingpy.automation.wingmen.dk/api/meraki-dashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [`self.headers`][wingpy.cisco.merakidashboard.CiscoMerakiDashboard.headers] before sending request.
+            Will be combined with [`self.headers`](https://wingpy.automation.wingmen.dk/api/meraki-dashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [`self.timeout`][wingpy.cisco.merakidashboard.CiscoMerakiDashboard.timeout] for a single request.
+            Override the standard timeout timer [`self.timeout`](https://wingpy.automation.wingmen.dk/api/meraki-dashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.timeout) for a single request.
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -348,7 +350,7 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `PUT` request to the specified path.
 
@@ -363,20 +365,21 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{fabricId}` in the URL path with actual values.
 
-            Will be combined with [`self.path_params`][wingpy.cisco.merakidashboard.CiscoMerakiDashboard.path_params] before sending request.
+            Will be combined with [`self.path_params`](https://wingpy.automation.wingmen.dk/api/cisco/merakidashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [`self.headers`][wingpy.cisco.merakidashboard.CiscoMerakiDashboard.headers] before sending request.
+            Will be combined with [`self.headers`](https://wingpy.automation.wingmen.dk/api/cisco/merakidashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [`self.timeout`][wingpy.cisco.merakidashboard.CiscoMerakiDashboard.timeout] for a single request.
+            Override the standard timeout timer [`self.timeout`](https://wingpy.automation.wingmen.dk/api/cisco/merakidashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.timeout) for a single request.
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -412,7 +415,7 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         path_params: dict | None = None,
         headers: dict | None = None,
         timeout: int | None = None,
-    ) -> httpx.Response:
+    ) -> ResponseMapping | ResponseSequence:
         """
         Send an HTTP `DELETE` request to the specified path.
 
@@ -424,20 +427,21 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{fabricId}` in the URL path with actual values.
 
-            Will be combined with [`self.path_params`][wingpy.cisco.merakidashboard.CiscoMerakiDashboard.path_params] before sending request.
+            Will be combined with [`self.path_params`](https://wingpy.automation.wingmen.dk/api/cisco/merakidashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [`self.headers`][wingpy.cisco.merakidashboard.CiscoMerakiDashboard.headers] before sending request.
+            Will be combined with [`self.headers`](https://wingpy.automation.wingmen.dk/api/cisco/merakidashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [`self.timeout`][wingpy.cisco.merakidashboard.CiscoMerakiDashboard.timeout] for a single request.
+            Override the standard timeout timer [`self.timeout`](https://wingpy.automation.wingmen.dk/api/cisco/merakidashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.timeout) for a single request.
 
         Returns
         -------
-        httpx.Response
-            The [`httpx.Response`](https://www.python-httpx.org/api/#response) object from the request.
+        ResponseMapping | ResponseSequence
+            The [`ResponseMapping`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseMapping) or
+            [`ResponseSequence`](https://wingpy.automation.wingmen.dk/api/response/#wingpy.response.ResponseSequence) object from the request.
         """
 
         response = self.request(
@@ -463,7 +467,7 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         headers: dict | None = None,
         timeout: int | None = None,
         page_size: int | None = None,
-    ) -> list:
+    ) -> list[dict]:
         """
         Retrieves all pages of data from a JSON endpoint.
 
@@ -485,15 +489,15 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         path_params : dict | None, default=None
             Replace placeholders like `{objectId}` in the URL path with actual values.
 
-            Will be combined with [`self.path_params`][wingpy.cisco.catalystcenter.CiscoCatalystCenter.path_params] before sending request.
+            Will be combined with [`self.path_params`](https://wingpy.automation.wingmen.dk/api/cisco/merakidashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.path_params) before sending request.
 
         headers : dict | None, default=None
             HTTP headers to be sent with the request.
 
-            Will be combined with [`self.headers`][wingpy.cisco.catalystcenter.CiscoCatalystCenter.headers] before sending request.
+            Will be combined with [`self.headers`](https://wingpy.automation.wingmen.dk/api/cisco/merakidashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.headers) before sending request.
 
         timeout : int | None, default=None
-            Override the standard timeout timer [`self.timeout`][wingpy.cisco.catalystcenter.CiscoCatalystCenter.timeout] for a single request.
+            Override the standard timeout timer [`self.timeout`](https://wingpy.automation.wingmen.dk/api/cisco/merakidashboard/#wingpy.cisco.merakidashboard.CiscoMerakiDashboard.timeout) for a single request.
 
         page_size : int | None, default=None
             Set a specific page size. Default value varies on the server side per API endpoint.
