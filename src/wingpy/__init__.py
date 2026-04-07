@@ -17,6 +17,7 @@ from wingpy.cisco import (
     CiscoModelingLabs,
     CiscoNexusDashboard,
     CiscoVmanage,
+    SplunkEnterprise,
 )
 from wingpy.generic import GenericRESTAPI
 from wingpy.logger import log_to_file, set_logging_level
@@ -35,6 +36,7 @@ __all__ = [
     "CiscoModelingLabs",
     "CiscoNexusDashboard",
     "CiscoVmanage",
+    "SplunkEnterprise",
     "log_to_file",
     "GenericRESTAPI",
     "Nautobot",

@@ -347,7 +347,9 @@ class XMLResponseMapping(Sequence, httpx.Response):
         """
 
         try:
-            self._root = etree.fromstring(response.text.strip().encode())
+            self._root: etree._Element = etree.fromstring(
+                response.text.strip().encode()
+            )
             """
             Attempt to parse the response content as XML and cache the root element. If the content is not valid XML, we will treat it as having no root (i.e., an empty sequence).
             """

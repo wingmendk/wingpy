@@ -13,6 +13,7 @@ from wingpy.cisco.ise import CiscoISE
 from wingpy.cisco.merakidashboard import CiscoMerakiDashboard
 from wingpy.cisco.nexusdashboard import CiscoNexusDashboard
 from wingpy.cisco.vmanage import CiscoVmanage
+from wingpy.cisco.splunkenterprise import SplunkEnterprise
 
 __all__ = [
     "CiscoAPIC",
@@ -24,4 +25,5 @@ __all__ = [
     "CiscoMerakiDashboard",
     "CiscoNexusDashboard",
     "CiscoVmanage",
+    "SplunkEnterprise",
 ]
