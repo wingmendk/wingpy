@@ -25,7 +25,7 @@ from wingpy.exceptions import (
     URLSchemaError,
 )
 from wingpy.interfaces import ApiClient
-from wingpy.logger import log_exception, logger
+from wingpy.logging import log_exception, logger
 from wingpy.scheduling import RequestLogEntry, RequestThrottler, TaskRunner
 from wingpy.response import (
     convert_response,

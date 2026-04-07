@@ -17,7 +17,7 @@ from wingpy.exceptions import (
     UnexpectedPayloadError,
     UnsupportedMethodError,
 )
-from wingpy.logger import log_exception, logger
+from wingpy.logging import log_exception, logger
 from wingpy.response import ResponseMapping, ResponseSequence
 
 

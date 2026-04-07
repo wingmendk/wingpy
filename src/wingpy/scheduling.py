@@ -22,7 +22,7 @@ from typing import Any, ParamSpec, TypeVar
 import arrow
 import httpx
 
-from wingpy.logger import logger
+from wingpy.logging import logger
 
 
 @dataclass

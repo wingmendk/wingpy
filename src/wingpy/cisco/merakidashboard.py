@@ -11,7 +11,7 @@ from ssl import SSLContext
 
 from wingpy.base import HttpResponsePattern, RestApiBaseClass
 from wingpy.exceptions import InvalidResponseError, UnsupportedMethodError
-from wingpy.logger import log_exception
+from wingpy.logging import log_exception
 from wingpy.response import ResponseSequence, ResponseMapping
 
 

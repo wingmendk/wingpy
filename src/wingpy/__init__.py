@@ -20,7 +20,7 @@ from wingpy.cisco import (
     SplunkEnterprise,
 )
 from wingpy.generic import GenericRESTAPI
-from wingpy.logger import log_to_file, set_logging_level
+from wingpy.logging import log_to_file, set_logging_level
 from wingpy.nsot import Nautobot, NetBox
 from wingpy.response import ResponseMapping, ResponseSequence, XMLResponseMapping
 

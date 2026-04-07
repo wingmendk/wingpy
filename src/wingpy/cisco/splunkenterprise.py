@@ -15,7 +15,7 @@ from packaging.version import Version
 
 from wingpy.base import RestApiBaseClass
 from wingpy.exceptions import UnsupportedMethodError
-from wingpy.logger import logger
+from wingpy.logging import logger
 from wingpy.response import XMLResponseMapping, ResponseMapping, ResponseSequence
 
 
@@ -59,7 +59,7 @@ class SplunkEnterprise(RestApiBaseClass):
     splunk = SplunkEnterprise(
         base_url="",
         username="example_username",
-        password="example_password",
+        password="example_password", # pragma: allowlist secret
     )
     splunk.get("/")
     ```

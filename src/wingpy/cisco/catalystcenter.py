@@ -13,7 +13,7 @@ from packaging.version import Version
 from wingpy.base import RestApiBaseClass
 from wingpy.exceptions import AuthenticationFailure, UnsupportedMethodError
 from wingpy.response import ResponseMapping, ResponseSequence
-from wingpy.logger import log_exception, logger
+from wingpy.logging import log_exception, logger
 
 
 class CiscoCatalystCenter(RestApiBaseClass):

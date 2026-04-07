@@ -12,7 +12,7 @@ from packaging.version import Version
 
 from wingpy.base import RestApiBaseClass
 from wingpy.exceptions import AuthenticationFailure, InvalidEndpointError
-from wingpy.logger import log_exception, logger
+from wingpy.logging import log_exception, logger
 
 
 class NetBox(RestApiBaseClass):
@@ -49,7 +49,7 @@ class NetBox(RestApiBaseClass):
     from wingpy import NetBox
     netbox = NetBox(
         base_url="http://netbox.example.com",
-        token="0123456789abcdef0123456789abcdef01234567",
+        token="0123456789abcdef0123456789abcdef01234567", # pragma: allowlist secret
     )
     netbox.get("/api/status/")
     ```

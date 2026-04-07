@@ -22,7 +22,7 @@ from wingpy.exceptions import (
     UnsupportedMethodError,
 )
 from wingpy.response import ResponseMapping, ResponseSequence, XMLResponseMapping
-from wingpy.logger import log_exception, logger
+from wingpy.logging import log_exception, logger
 
 
 class CiscoAPIC(RestApiBaseClass):
