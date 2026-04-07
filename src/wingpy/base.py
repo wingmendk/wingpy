@@ -9,6 +9,7 @@ import re
 import threading
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
+from importlib.metadata import version
 from ssl import SSLContext
 from typing import ClassVar, get_type_hints
 from urllib.parse import urlparse
@@ -26,13 +27,15 @@ from wingpy.exceptions import (
 )
 from wingpy.interfaces import ApiClient
 from wingpy.logging import log_exception, logger
-from wingpy.scheduling import RequestLogEntry, RequestThrottler, TaskRunner
 from wingpy.response import (
-    convert_response,
     ResponseMapping,
     ResponseSequence,
     XMLResponseMapping,
+    convert_response,
 )
+from wingpy.scheduling import RequestLogEntry, RequestThrottler, TaskRunner
+
+USER_AGENT = f"wingpy/{version('wingpy')} python-httpx/{version('httpx')}"
 
 
 @dataclass
@@ -907,6 +910,7 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
                 timeout=self.timeout,
                 http2=False,
                 limits=limits,
+                headers={"User-Agent": USER_AGENT},
             )
 
     def _ensure_auth(self):
