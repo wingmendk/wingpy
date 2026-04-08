@@ -177,3 +177,5 @@ thumbs.db
 
 # direnv
 .envrc
+
+requirements.txt
