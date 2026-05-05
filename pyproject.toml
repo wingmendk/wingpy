@@ -17,7 +17,7 @@ dependencies = [
     "httpx[socks]>=0.28.1",
     "httpcore>=1.0.9",
     "loguru>=0.7.3",
-    "lxml>=5.3.2",
+    "lxml>=6.1.0",
     "packaging>=24.2",
     "rich>=13.9.4",
     "pygments>=2.20.0",
@@ -83,9 +83,12 @@ docs = [
     "mkdocs-material[imaging]>=9.7.0",
     "mkdocstrings[python]>=0.29.1",
     "pygments>=2.20.0",
-    "pymdown-extensions~=10.14",
+    "pymdown-extensions>=10.14",
     "termynal>=0.13.0",
 ]
+
+[project.scripts]
+wingpy-skill = "wingpy.skillgen:run"
 
 [build-system]
 requires = ["hatchling"]
