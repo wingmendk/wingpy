@@ -691,7 +691,28 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
                 else:
                     return response
 
-            elif response.status_code <= 399:
+            elif response.has_redirect_location:
+                parsed_location_url = urlparse(response.headers.get("Location"))
+
+                # Update the client base url to use redirected host for future requests
+                parsed_base_url = urlparse(self.base_url)
+                self.base_url = f"{parsed_base_url.scheme}://{parsed_location_url.netloc}{parsed_base_url.path}"
+
+                # Rebuild the request
+                request = httpx.Request(
+                    method=request.method,
+                    url=request.url.copy_with(
+                        host=parsed_location_url.hostname,
+                        port=parsed_location_url.port,
+                    ),
+                    # Exclude the allready serialized Host-header
+                    headers=[
+                        (k, v) for k, v in request.headers.raw if k.lower() != b"host"
+                    ],
+                    content=request.content,
+                )
+
+            elif response.status_code <= 299:
                 self.throttler.reset_backoff()
                 return response
 
