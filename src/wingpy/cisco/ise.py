@@ -146,6 +146,12 @@ class CiscoISE(RestApiBaseClass):
         """
         pass
 
+    def _refresh_auth(self) -> None:
+        """
+        No dedicated authentication token refresh mechanism is available for ISE.
+        """
+        pass
+
     def _after_auth(self, **kwargs) -> None:
         """
         Handle meta data retrieval after authentication.

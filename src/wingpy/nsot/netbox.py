@@ -138,6 +138,12 @@ class NetBox(RestApiBaseClass):
 
         self.headers["Authorization"] = f"Token {self.token}"
 
+    def _refresh_auth(self) -> None:
+        """
+        No dedicated authentication token refresh mechanism is available for NetBox.
+        """
+        pass
+
     @property
     def is_authenticated(self):
         """

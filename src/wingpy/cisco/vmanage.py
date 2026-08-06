@@ -270,6 +270,12 @@ class CiscoVmanage(RestApiBaseClass):
 
         return response
 
+    def _refresh_auth(self) -> None:
+        """
+        No dedicated authentication token refresh mechanism is available for session-based vManage.
+        """
+        self.authenticate()
+
     @property
     def is_authenticated(self):
         """

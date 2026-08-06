@@ -4,12 +4,9 @@
 # This file is part of wingpy, distributed under the terms of the GNU GPLv3.
 # See the LICENSE, NOTICE, and AUTHORS files for more information.
 
-import base64
-import json
 import os
 from ssl import SSLContext
 
-import arrow
 from packaging.version import Version
 
 from wingpy.base import RestApiBaseClass
@@ -202,15 +199,13 @@ class CiscoModelingLabs(RestApiBaseClass):
         self.token = response.json()
         self.headers["Authorization"] = f"Bearer {self.token}"
 
-        # Split JWT token to extract payload with expiration time
-        jwt = self.token.split(".")
-        jwt_payload_padded = jwt[1] + "=" * divmod(len(jwt[1]), 4)[1]
-
-        # Decode payload and calculate lifetime
-        jwt_payload = json.loads(base64.urlsafe_b64decode(jwt_payload_padded))
-        self.auth_lifetime = int(jwt_payload["exp"] - arrow.utcnow().timestamp())
-
         return response
+
+    def _refresh_auth(self) -> None:
+        """
+        No dedicated authentication token refresh mechanism is available for CML.
+        """
+        self.authenticate()
 
     @property
     def is_authenticated(self):
@@ -223,6 +218,8 @@ class CiscoModelingLabs(RestApiBaseClass):
         """
         Handle meta data retrieval after authentication.
         """
+
+        self.update_lifetime_from_jwt()
 
         if not self.is_authenticated:
             raise AuthenticationFailure("Authentication required before use")

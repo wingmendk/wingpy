@@ -12,8 +12,8 @@ from packaging.version import Version
 
 from wingpy.base import RestApiBaseClass
 from wingpy.exceptions import AuthenticationFailure, UnsupportedMethodError
-from wingpy.response import ResponseMapping, ResponseSequence
 from wingpy.logging import log_exception, logger
+from wingpy.response import ResponseMapping, ResponseSequence
 
 
 class CiscoCatalystCenter(RestApiBaseClass):
@@ -183,6 +183,12 @@ class CiscoCatalystCenter(RestApiBaseClass):
         self.headers["X-auth-token"] = self.token
         return response
 
+    def _refresh_auth(self) -> None:
+        """
+        No dedicated authentication token refresh mechanism is available for Catalyst Center.
+        """
+        self.authenticate()
+
     @property
     def is_authenticated(self):
         """
@@ -194,6 +200,8 @@ class CiscoCatalystCenter(RestApiBaseClass):
         """
         Handle meta data retrieval after authentication.
         """
+
+        self.update_lifetime_from_jwt()
 
         if not self.is_authenticated:
             err = AuthenticationFailure("Authentication required before use")

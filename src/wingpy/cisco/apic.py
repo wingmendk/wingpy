@@ -21,8 +21,8 @@ from wingpy.exceptions import (
     InvalidResponseError,
     UnsupportedMethodError,
 )
-from wingpy.response import ResponseMapping, ResponseSequence, XMLResponseMapping
 from wingpy.logging import log_exception, logger
+from wingpy.response import ResponseMapping, ResponseSequence, XMLResponseMapping
 
 
 class CiscoAPIC(RestApiBaseClass):
@@ -157,10 +157,23 @@ class CiscoAPIC(RestApiBaseClass):
         The version of the APIC API.
         """
 
-        self._token: str | None = None
+        self.token: str | None = None
         """
         The current token for the APIC API.
         """
+
+    def _store_auth_tokens(self, auth_response: ResponseSequence) -> None:
+        try:
+            self.token = auth_response["imdata"][0]["aaaLogin"]["attributes"]["token"]
+        except (KeyError, IndexError):  # pragma: no cover
+            error = AuthenticationFailure(
+                "Failed to retrieve authentication token from response.",
+                response=auth_response,
+            )
+            log_exception(error)
+            raise error
+
+        self.headers["Cookie"] = f"APIC-Cookie={self.token}"
 
     def _authenticate(self) -> ResponseMapping:
         """
@@ -214,7 +227,7 @@ class CiscoAPIC(RestApiBaseClass):
             raise error
 
         try:
-            response_data = response.json()
+            response.json()
         except json.JSONDecodeError:  # pragma: no cover
             error = AuthenticationFailure(
                 "Authentication response is not in JSON format", response=response
@@ -222,30 +235,43 @@ class CiscoAPIC(RestApiBaseClass):
             log_exception(error)
             raise error
 
+        self._store_auth_tokens(response)
+
+        return response
+
+    def _refresh_auth(self) -> None:
+        """
+        Refresh authentication token using dedicated endpoint.
+        """
+        response = self.request(
+            "POST",
+            "/api/aaaRefresh.json",
+            data=None,
+            params=None,
+            path_params=None,
+            headers=None,
+            timeout=None,
+            is_auth_endpoint=True,
+            auth=None,
+        )
+
         try:
-            self._token = response_data["imdata"][0]["aaaLogin"]["attributes"]["token"]
-        except (KeyError, IndexError):  # pragma: no cover
+            response.json()
+        except json.JSONDecodeError:  # pragma: no cover
             error = AuthenticationFailure(
-                "Failed to retrieve authentication token from response.",
-                response=response,
+                "Refresh response is not in JSON format", response=response
             )
             log_exception(error)
             raise error
 
-        self.headers["Cookie"] = f"APIC-Cookie={self._token}"
-
-        return response
+        self._store_auth_tokens(response)
 
     def _after_auth(self, *, auth_response):
         """
         Handle meta data retrieval after authentication.
         """
 
-        auth_rsp_payload = auth_response.json()
-        refresh_timeout = auth_rsp_payload["imdata"][0]["aaaLogin"]["attributes"][
-            "refreshTimeoutSeconds"
-        ]
-        self.auth_lifetime = int(refresh_timeout)
+        self.update_lifetime_from_jwt()
 
         response = self.request(
             "GET",
@@ -280,7 +306,7 @@ class CiscoAPIC(RestApiBaseClass):
         """
         Check if the client is authenticated.
         """
-        return self._token is not None
+        return self.token is not None
 
     def get(
         self,

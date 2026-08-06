@@ -8,11 +8,10 @@ import os
 import re
 from ssl import SSLContext
 
-
 from wingpy.base import HttpResponsePattern, RestApiBaseClass
 from wingpy.exceptions import InvalidResponseError, UnsupportedMethodError
 from wingpy.logging import log_exception
-from wingpy.response import ResponseSequence, ResponseMapping
+from wingpy.response import ResponseMapping, ResponseSequence
 
 
 class CiscoMerakiDashboard(RestApiBaseClass):
@@ -154,6 +153,12 @@ class CiscoMerakiDashboard(RestApiBaseClass):
         No dedicated authentication is available for Meraki Dashboard.
         """
         self.headers["Authorization"] = f"Bearer {self.token}"
+
+    def _refresh_auth(self) -> None:
+        """
+        No dedicated authentication token refresh mechanism is available for token based Meraki Dashboard API.
+        """
+        pass
 
     def _after_auth(self, *, auth_response):
         if self.meraki_dashboard_org_name:

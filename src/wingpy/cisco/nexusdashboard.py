@@ -227,6 +227,12 @@ class CiscoNexusDashboard(RestApiBaseClass):
         else:
             raise ValueError("Password or API key must be provided for authentication")
 
+    def _refresh_auth(self) -> None:
+        """
+        No dedicated authentication token refresh mechanism is available for Nexus Dashboard.
+        """
+        self.authenticate()
+
     @property
     def is_authenticated(self):
         """
@@ -243,6 +249,8 @@ class CiscoNexusDashboard(RestApiBaseClass):
         AuthenticationFailure
             If no authentication token is available after authentication.
         """
+        if self.token:
+            self.update_lifetime_from_jwt()
 
         if not self.is_authenticated:
             error = AuthenticationFailure(

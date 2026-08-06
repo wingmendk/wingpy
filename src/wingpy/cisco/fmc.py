@@ -174,10 +174,26 @@ class CiscoFMC(RestApiBaseClass):
         The version of the FMC API.
         """
 
-        self._token: str | None = None
+        self.token: str | None = None
         """
         The current token for the FMC API.
         """
+
+        self.refresh_token: str | None = None
+        """
+        The current refresh token for the FMC API.
+        """
+
+        self.refresh_count: int = 0
+        """
+        The number of token refreshes. FMC allows 3 refreshes before a new authentication flow is needed.
+        """
+
+    def _store_auth_tokens(self, auth_response: httpx.Response) -> None:
+        auth_headers = auth_response.headers
+        self.token = auth_headers.get("X-auth-access-token")
+        self.refresh_token = auth_headers.get("X-auth-refresh-token")
+        self.headers["X-auth-access-token"] = self.token
 
     def _authenticate(self) -> ResponseMapping | ResponseSequence:
         """
@@ -219,16 +235,15 @@ class CiscoFMC(RestApiBaseClass):
         )
         response.raise_for_status()
 
-        auth_headers = response.headers
-        self._token = auth_headers.get("X-auth-access-token")
-
-        if response.status_code == 204:
-            # Successful authentication response
-            self.headers["X-auth-access-token"] = self._token
-        else:  # pragma: no cover
+        if response.status_code != 204:  # pragma: no cover
             raise Exception(
                 f"Unexpected response code for authentication: {response.status_code}"
             )
+
+        # Successful authentication response
+        self._store_auth_tokens(response)
+        self.refresh_count = 0
+
         return response
 
     @property
@@ -237,7 +252,7 @@ class CiscoFMC(RestApiBaseClass):
         Check if the client is authenticated.
         """
 
-        return self._token is not None
+        return self.token is not None
 
     def _after_auth(self, *, auth_response: httpx.Response) -> None:
         """
@@ -300,6 +315,36 @@ class CiscoFMC(RestApiBaseClass):
             )
         else:
             logger.info("Unable to detect FMC version")
+
+    def _refresh_auth(self) -> None:
+        """
+        Refresh authentication token using dedicated endpoint.
+        """
+        logger.trace(f"FMC token refresh counter = {self.refresh_count}")
+        if self.refresh_count >= 3:
+            self.authenticate()
+            return
+
+        logger.info("Refreshing authentication token")
+        response = self.post(
+            "/api/fmc_platform/v1/auth/refreshtoken",
+            headers={
+                "X-auth-refresh-token": self.refresh_token,
+            },
+            data=None,
+            is_auth_endpoint=True,
+        )
+        response.raise_for_status()
+
+        if response.status_code != 204:  # pragma: no cover
+            raise Exception(
+                f"Unexpected response code for authentication: {response.status_code}"
+            )
+
+        # Successful refresh response
+        self._store_auth_tokens(response)
+        self.refresh_count += 1
+        return
 
     def get(
         self,

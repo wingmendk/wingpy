@@ -16,7 +16,7 @@ from packaging.version import Version
 from wingpy.base import RestApiBaseClass
 from wingpy.exceptions import UnsupportedMethodError
 from wingpy.logging import logger
-from wingpy.response import XMLResponseMapping, ResponseMapping, ResponseSequence
+from wingpy.response import ResponseMapping, ResponseSequence, XMLResponseMapping
 
 
 class SplunkEnterprise(RestApiBaseClass):
@@ -160,6 +160,12 @@ class SplunkEnterprise(RestApiBaseClass):
         None
         """
 
+        pass
+
+    def _refresh_auth(self) -> None:
+        """
+        No dedicated authentication token refresh mechanism is available for Splunk Enterprise.
+        """
         pass
 
     @property

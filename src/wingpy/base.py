@@ -4,6 +4,7 @@
 # This file is part of wingpy, distributed under the terms of the GNU GPLv3.
 # See the LICENSE, NOTICE, and AUTHORS files for more information.
 
+import base64
 import json
 import re
 import threading
@@ -20,6 +21,7 @@ from lxml import etree
 
 from wingpy.exceptions import (
     AuthenticationFailure,
+    InvalidTokenFormatError,
     MissingPathParameterError,
     URLNetlocError,
     URLPathError,
@@ -323,7 +325,14 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
         """Allow only one thread to authenticate at a time."""
 
     @abstractmethod
-    def _authenticate(self) -> httpx.Response:
+    def _authenticate(self) -> ResponseMapping | ResponseSequence:
+        """
+        Abstract method to authenticate with the API server.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def _refresh_auth(self) -> ResponseMapping | ResponseSequence:
         """
         Abstract method to authenticate with the API server.
         """
@@ -451,6 +460,26 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
         self.auth_timestamp = arrow.utcnow()
 
         self._after_auth(auth_response=auth_response)
+
+    def refresh_auth(self) -> None:
+        """
+        Executes the API-specific authentication refresh process and records timestamps
+        for session tracking.
+
+        Notes
+        ----
+        Authentication will automatically be carried out just-in-time.
+
+        Only call this method directly if you need to refresh authentication proactively,
+        outside of normal request flow.
+        """
+
+        # Refresh
+        logger.debug("Authenticating and recording token lifetime")
+        self._refresh_auth()
+
+        # Record the time of refresh
+        self.auth_timestamp = arrow.utcnow()
 
     def _after_auth(
         self, *, auth_response: ResponseMapping | ResponseSequence | XMLResponseMapping
@@ -941,16 +970,35 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
         # Authenticate if this is the first time
         with self._auth_lock:
             if self.auth_timestamp is None:
-                logger.debug("No authentication token found")
+                logger.debug("No authentication timestamp found yet")
                 self.authenticate()
             else:
                 # Refresh before the token expires after a percentage of the lifetime
-                if self.auth_lifetime > 0:
-                    refresh_after = self.auth_lifetime * self.auth_refresh_percentage
-                    refresh_at = self.auth_timestamp.shift(seconds=refresh_after)
-                    if arrow.utcnow() > refresh_at:
-                        logger.debug("Authentication token expired")
-                        self.authenticate()
+                logger.trace(f"{self.auth_lifetime=}")
+                if self.auth_lifetime <= 0:
+                    return
+
+                now = arrow.utcnow()
+
+                # If the token is expired, restart authentication flow. Allow margin for transaction time
+                logger.trace(f"{self.auth_timestamp=}")
+                logger.trace(
+                    f"{self.auth_timestamp.shift(seconds=self.auth_lifetime - self.timeout)=}"
+                )
+                expires_at = self.auth_timestamp.shift(
+                    seconds=self.auth_lifetime - self.timeout
+                )
+                if now > expires_at:
+                    logger.debug("Re-authentication")
+                    self.authenticate()
+                    return
+
+                # If the token expires soon, refresh it
+                refresh_after = self.auth_lifetime * self.auth_refresh_percentage
+                refresh_at = self.auth_timestamp.shift(seconds=refresh_after)
+                if now > refresh_at:
+                    logger.debug("Refreshing authentication")
+                    self.refresh_auth()
 
     def close(self) -> None:
         """
@@ -1020,3 +1068,43 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
             raise ValueError(
                 "Data for request payload must be provided as string, dict, list or lxml.etree.Element"
             )
+
+    def update_lifetime_from_jwt(self) -> None:
+        """
+        Updates the token lifetime by decoding JWT timestamp for issuing and expiration.
+
+        Raises
+        ------
+        InvalidTokenFormatError
+            If the token can't be decoded as JWT with an expiration field.
+        """
+
+        if not isinstance(self.token, str):
+            raise InvalidTokenFormatError("Not a string", self)
+
+        try:
+            # Split JWT token to extract payload with expiration time
+            jwt = self.token.split(".")
+            jwt_payload_padded = jwt[1] + "=" * divmod(len(jwt[1]), 4)[1]
+
+            # Decode payload
+            jwt_payload = json.loads(base64.urlsafe_b64decode(jwt_payload_padded))
+        except Exception:
+            raise InvalidTokenFormatError("Invalid contents", self)
+
+        # Check for expiration timestamp
+        if "exp" not in jwt_payload:
+            raise InvalidTokenFormatError("JWT expiration field `exp` not found", self)
+
+        # Use issuing timestamp from JWT if available
+        if "iat" in jwt_payload:
+            iat = jwt_payload["iat"]
+        else:
+            iat = arrow.utcnow().timestamp()
+
+        # Calculate lifetime
+        lifetime = int(jwt_payload["exp"] - iat)
+        logger.debug(f"Detected session timeout of {lifetime} seconds")
+        self.auth_lifetime = lifetime
+
+        return True

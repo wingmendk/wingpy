@@ -241,3 +241,33 @@ class InvalidResponseError(WingpyException):
             msg += f"\nResponse content: {self.response.text}"
 
         return msg
+
+
+@dataclass
+class InvalidTokenFormatError(WingpyException):
+    """
+    Raised when an authentication token has a different format that expected.
+    """
+
+    client: ApiClient | None = None
+    """The client class that is handling the token."""
+
+    def __str__(self) -> str:
+        msg = self.message
+
+        if isinstance(self.client, ApiClient):
+            client_name = self.client.__class__.__name__
+        else:
+            client_name = "this API"
+
+        if self.client.token is None:
+            token_rpr = "None"
+        elif isinstance(self.client.token, str):
+            token_rpr = f"string with length {len(self.client.token)}"
+        else:
+            token_rpr = str(type(self.client.token))
+
+        if self.response:
+            msg += f"\nInvalid JWT for {client_name}: {token_rpr}"
+
+        return msg

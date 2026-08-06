@@ -66,6 +66,12 @@ class GenericRESTAPI(RestApiBaseClass):
         """
         pass
 
+    def _refresh_auth(self) -> None:
+        """
+        No dedicated authentication token refresh mechanism is available for Generic.
+        """
+        pass
+
     @property
     def is_authenticated(self):
         """

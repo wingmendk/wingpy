@@ -8,7 +8,6 @@ import os
 import re
 from ssl import SSLContext
 
-
 from wingpy.base import HttpResponsePattern, RestApiBaseClass
 from wingpy.exceptions import UnsupportedMethodError
 from wingpy.logging import log_exception
@@ -117,6 +116,12 @@ class CiscoHyperfabric(RestApiBaseClass):
         No dedicated authentication is available for Hyperfabric.
         """
         self.headers["Authorization"] = f"Bearer {self.token}"
+
+    def _refresh_auth(self) -> None:
+        """
+        No dedicated authentication token refresh mechanism is available for Hyperfabric.
+        """
+        pass
 
     @property
     def is_authenticated(self):
