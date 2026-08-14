@@ -49,7 +49,7 @@ class NetBox(RestApiBaseClass):
     from wingpy import NetBox
     netbox = NetBox(
         base_url="http://netbox.example.com",
-        token="0123456789abcdef0123456789abcdef01234567", # pragma: allowlist secret
+        token="0123456789abcdef0123456789abcdef01234567",
     )
     netbox.get("/api/status/")
     ```

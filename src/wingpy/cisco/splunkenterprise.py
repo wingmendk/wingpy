@@ -59,7 +59,7 @@ class SplunkEnterprise(RestApiBaseClass):
     splunk = SplunkEnterprise(
         base_url="",
         username="example_username",
-        password="example_password", # pragma: allowlist secret
+        password="example_password",
     )
     splunk.get("/")
     ```

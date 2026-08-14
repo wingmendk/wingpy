@@ -224,6 +224,27 @@ class MissingPathParameterError(WingpyException):
 
 
 @dataclass
+class InvalidJobError(WingpyException):
+    """
+    Raised when the API usage is not compatible with asychronous job handling.
+    """
+
+    response: httpx.Response | None = None
+    """The HTTP response returned by the API."""
+
+    def __str__(self) -> str:
+        msg = self.message
+
+        if self.response:
+            msg += f"\nRequest path: {self.response.url.path}"
+            msg += f"\nResponse status code: {self.response.status_code}"
+            msg += f"\nResponse content: {self.response.text}"
+            msg += f"\nResponse headers: {self.response.headers}"
+
+        return msg
+
+
+@dataclass
 class InvalidResponseError(WingpyException):
     """
     Raised when the API returned an invalid or unexpected HTTP response.

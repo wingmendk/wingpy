@@ -178,6 +178,7 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
         *,
         base_url: str,
         verify: SSLContext | bool = True,
+        http2: bool = False,
         backoff_initial: int = 1,
         backoff_multiplier: float = 2.0,
         retries: int = 3,
@@ -242,6 +243,16 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
         - `True`: Verify the server's SSL certificate using the system's CA certificates.
         - `False`: Disable SSL certificate verification.
         - `ssl.create_default_context(cafile="my-custom-ca.pem")`: Use a custom CA certificate for verification.
+        """
+
+        self.http2: bool = http2
+        """
+        Enable or disable HTTP/2 transport for the underlying HTTP client.
+
+        Examples
+        --------
+        - `False`: Use HTTP/1.1 (default)
+        - `True`: Attempt HTTP/2 when supported by the server and TLS stack
         """
 
         self.headers: dict = headers or {}
@@ -958,7 +969,7 @@ class RestApiBaseClass(ApiClient, metaclass=RequireClassVarsMeta):
             self.client = httpx.Client(
                 verify=self.verify,
                 timeout=self.timeout,
-                http2=False,
+                http2=self.http2,
                 limits=limits,
                 headers={"User-Agent": USER_AGENT},
             )

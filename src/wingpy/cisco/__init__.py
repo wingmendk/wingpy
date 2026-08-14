@@ -12,6 +12,7 @@ from wingpy.cisco.hyperfabric import CiscoHyperfabric
 from wingpy.cisco.ise import CiscoISE
 from wingpy.cisco.merakidashboard import CiscoMerakiDashboard
 from wingpy.cisco.nexusdashboard import CiscoNexusDashboard
+from wingpy.cisco.sna import CiscoSNA
 from wingpy.cisco.splunkenterprise import SplunkEnterprise
 from wingpy.cisco.vmanage import CiscoVmanage
 
@@ -24,6 +25,7 @@ __all__ = [
     "CiscoHyperfabric",
     "CiscoMerakiDashboard",
     "CiscoNexusDashboard",
+    "CiscoSNA",
     "CiscoVmanage",
     "SplunkEnterprise",
 ]

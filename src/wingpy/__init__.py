@@ -16,6 +16,7 @@ from wingpy.cisco import (
     CiscoMerakiDashboard,
     CiscoModelingLabs,
     CiscoNexusDashboard,
+    CiscoSNA,
     CiscoVmanage,
     SplunkEnterprise,
 )
@@ -35,6 +36,7 @@ __all__ = [
     "CiscoMerakiDashboard",
     "CiscoModelingLabs",
     "CiscoNexusDashboard",
+    "CiscoSNA",
     "CiscoVmanage",
     "SplunkEnterprise",
     "log_to_file",

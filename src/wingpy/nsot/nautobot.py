@@ -52,7 +52,7 @@ class Nautobot(RestApiBaseClass):
     from wingpy import Nautobot
     nautobot = Nautobot(
         base_url="http://nautobot.example.com",
-        token="0123456789abcdef0123456789abcdef01234567", # pragma: allowlist secret
+        token="0123456789abcdef0123456789abcdef01234567"
     )
     nautobot.get("/api/status/")
     ```
